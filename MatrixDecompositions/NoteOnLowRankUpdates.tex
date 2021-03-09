@@ -1,0 +1,4 @@
+\documentclass{article}
+\begin{document}
+My algorithm concatenates the $(C \times M)$ matrices to compute a singular value decomposition, so that the resulting update will be low rank at every frequency. The split operation undoing the concatenation destroys the orthogonality of the right-side basis vectors across filters (assuming concatenation enforces the same channel-subspace for all filters), wrecking the diagonalization for Woodbury form in the process. This can be fixed through an eigendecomposition of the inner product in frequency domain.
+\end{document}

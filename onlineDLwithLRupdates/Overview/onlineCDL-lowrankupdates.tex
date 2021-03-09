@@ -1,0 +1,497 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+
+\section{Convolutional Dictionary Model}
+
+I will treat "convolution" and "circular convolution" as equivalent here. They are equivalent except at the boundaries. For boundary handling, see \cite{wohlberg2016boundary}.
+
+We model a signal as a sum of convolutions. $\vk_{c,i}$ are the dictionary atom filters, $c$ specifying channel, and $i$ specifying the filter. $\vs_{c,n}$ is the signal, $c$ specifying channel, and $n$ specifying sample. $\vx_{i,n}$ are the coefficients, $i$ specifying the filter, and $n$ specifying the sample.
+
+\begin{equation}
+\vs_{c,n} = \vepsilon + \sum_{i} \vx_{i,n} * \vk_{c,i}
+\end{equation}
+
+
+We can construct a dictionary atom filter matrix by padding the filter, and then constructing a circulant matrix from the padded filter.
+
+\begin{equation}
+\mD_{c,i} = \operatorname{circ}(\operatorname{pad}(\vk_{c,i}))
+\end{equation}
+
+This matrix operator performs circular convolution:
+
+\begin{equation}
+\vx_{i,n} * \vk_{c,i} = \mD_{c,i}\vx_{i,n}
+\end{equation}
+
+So, we have the following.
+\begin{equation}
+\mD_c = \begin{bmatrix} \mD_{c,1} & \hdots & \mD_{c,K} \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vx_n = \begin{bmatrix} \vx_{1,n} \\
+                      \vdots \\ 
+                      \vx_{K,n} 
+      \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vs_{c,n} = \vepsilon + \mD_c\vx_n
+\end{equation}
+
+
+$C$ is the number of channels.
+$N$ is the number of samples.
+$\vs_{i,n}$ is the $i$th channel of the $n$th sample signal.
+
+\begin{equation}
+\begin{aligned}
+\mS = \begin{bmatrix} \vs_{1,1} & \hdots & \vs_{1,N} \\
+                      \vdots & \ddots & \vdots \\
+                      \vs_{C,1} & \hdots & \vs_{C,N}
+      \end{bmatrix}
+\end{aligned}
+\end{equation}
+
+$\mD_{c,i}$ is the $c$th channel of subdictionary corresponding to the $i$th dictionary atom filter.
+
+\begin{equation}
+\begin{aligned}
+\mD = \begin{bmatrix} \mD_{1,1} & \hdots & \mD_{1,K} \\
+                      \vdots & \ddots & \vdots \\
+                      \mD_{C,1} & \hdots & \mD_{C,K}
+      \end{bmatrix}
+\end{aligned}
+\end{equation}
+
+$\vx_{i,n}$ is the coefficients corresponding to the $i$th dictionary atom filter for the $n$th sample.
+
+\begin{equation}
+\mX = \begin{bmatrix} \vx_{1,1} & \hdots & \vx_{1,N} \\
+                      \vdots & \ddots & \vdots \\ 
+                      \vx_{K,1} & \hdots & \vx_{K,N} 
+      \end{bmatrix}
+\end{equation}
+
+Finally, we have the full equation:
+
+\begin{equation}
+\mS \approx \mD\mX
+\end{equation}
+
+\section{Dictionary Learning Overview}
+
+Using the dictionary $\mD$ constructed from dictionary atom filters $\vk_i$, dictionary learning can be thought of as the following minimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\mX,\mK} & \frac{1}{2}\|\mS - \mD\mX\|_F^2 + \lambda\|\mX\|_1\\
+\text{subject to } & \|\vk_{c,i}\|_2 \leq 1\\
+                   & \mD_{c,i} = \operatorname{circ}(\operatorname{pad}(\vk_{c,i}))
+\end{aligned}
+\end{equation}
+
+Solving this jointly is just too hard. So, instead, we alternate updates of $\mD$ for fixed $\mX$ and updates for $\mX$ for fixed $\mD$.
+
+\section{The Coefficient Update}
+
+We can update coefficients independently for each sample:
+\begin{equation}
+\begin{aligned}
+\min_{\vx_n} & \frac{1}{2}\|\vs_n - \mD\vx_n\|_F^2 + \lambda\|\vx_n\|_1
+\end{aligned}
+\end{equation}
+
+The standard approach to solving this problem is alternating direction method of multipliers (ADMM).
+
+\subsection{ADMM}
+
+ADMM works like this. To solve the problem
+
+\begin{equation}
+\min_x f(x) + g(x)
+\end{equation}
+
+ADMM splits $\vx$ into two variables $\vx$ and $\vy$, and then constains the two to be equal.
+
+\begin{equation}
+\begin{aligned}
+\min_{x,y} & f(x) + g(y) \\
+\text{subject to } & y - x = 0
+\end{aligned}
+\end{equation}
+
+ADMM is an iterative algorithm with the following update equations:
+
+\begin{equation}
+x^{(k + 1)} = \min_x f(x) + g(y^{(k)}) + \frac{\rho}{2}\|y^{(k)} - x + \frac{\gamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+\begin{equation}
+y^{(k + 1)} = \min_y f(x^{(k + 1)}) + g(y) + \frac{\rho}{2}\|y - x^({k + 1}) + \frac{\gamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+\begin{equation}
+\gamma^{(k + 1)} = \gamma^{(k)} + \rho(y^{(k + 1)} - x^{(k + 1)})
+\end{equation}
+
+Obviously, a couple variables were added here. $\rho$ is a scalar hyperparameter. $\gamma$ is the dual variable corresponding to the constraint $y - x = 0$. If you want a surface level understanding without delving deep into convex optimization, I think my ADMM slides are your best bet. Here's another source on ADMM \cite{boyd2011distributed}, but I don't think it's very accessable without a convex optimization background. 
+
+\subsection{Applying ADMM to the Coefficient Update}
+
+\begin{equation}
+f(\vx_n) = \frac{1}{2}\|\vs_n - \mD\vx_n\|_F^2
+\end{equation}
+
+
+\begin{equation}
+g(\vy_n) = \lambda\|\vy_n\|_1
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx_n,\vy_n} & f(\vx_n) + g(\vy_n) \\
+\text{subject to } & \vy_n - \vx_n = 0
+\end{aligned}
+\end{equation}
+
+\subsubsection{First Update Equation}
+\begin{equation}
+\vx_n^{(k + 1)} = \min_{\vx} f(\vx) + g(\vy_n^{(k)}) + \frac{\rho}{2}\|\vy_n^{(k)} - \vx + \frac{\vgamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+\begin{equation}
+\vx_n^{(k + 1)} = \min_{\vx} \frac{1}{2}\|\vs_n - \mD\vx\|_F^2 + \lambda\|\vy_n^{(k)}\|_1 + \frac{\rho}{2}\|\vy_n^{(k)} - \vx + \frac{\vgamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+Take the derivative in respect to $\vx$ and set equal to zero.
+
+\begin{equation}
+\vzero = \mD^T\mD\vx - \mD^T\vs_n + \rho\vx - \rho(\vy_n^{(k)}  + \frac{\vgamma^{(k)}}{\rho})
+\end{equation}
+
+Shuffling things around, we have
+
+\begin{equation}
+(\rho\mId + \mD^T\mD)\vx = \mD^T\vs_n + \rho(\vy_n^{(k)}  + \frac{\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vx_n^{(k + 1)} = (\rho\mId + \mD^T\mD)^{-1}(\mD^T\vs_n + \rho(\vy_n^{(k)}  + \frac{\vgamma^{(k)}}{\rho}))
+\end{equation}
+
+\subsubsection{Second Update equation}
+\begin{equation}
+\vy_n^{(k + 1)} = \min_{\vy} f(\vx_n^{(k + 1)}) + g(\vy) + \frac{\rho}{2}\|\vy - \vx_n^{(k + 1)} + \frac{\vgamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+\begin{equation}
+\vy_n^{(k + 1)} = \min_{\vy} \frac{1}{2}\|\vs_n - \mD\vx_n^{(k + 1)}\|_F^2 + \lambda\|\vy\|_1 + \frac{\rho}{2}\|\vy - \vx_n^{(k + 1)} + \frac{\vgamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+Removing the irrelevant term.
+
+\begin{equation}
+\vy_n^{(k + 1)} = \min_{\vy}  \frac{\rho}{2}\|\vy - \vx_n^{(k + 1)} + \frac{\vgamma^{(k)}}{\rho}\|_2^2 + \lambda\|\vy\|_1
+\end{equation}
+
+This minimization problem is the proximal operator for the L1-norm. The solution is well-known, so I'll pass on deriving it. It's the elementwise shrinkage operator. (I included a brief explanation of proximal operators and FISTA at the end).
+
+\begin{equation}
+\operatorname{S}_{\lambda}(x) = \begin{cases}
+x - \lambda & x > \lambda \\
+0 & -\lambda < x < \lambda \\
+x + \lambda & x < - \lambda
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\vy_n^{(k + 1)} = S_{\lambda}(\vx_n^{(k + 1)} - \frac{\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\subsubsection{Third Update Equation}
+
+Nothing really changed here.
+
+\begin{equation}
+\vgamma^{(k + 1)} = \vgamma^{(k)} + \rho(\vy_n^{(k + 1)} - \vx_n^{(k + 1)})
+\end{equation}
+
+\subsection{Working with the Update Equations}
+
+The second and third update equations are simple and straightforward to implement.
+
+The first is not.
+
+\begin{equation}
+\vx_n^{(k + 1)} = (\rho\mId + \mD^T\mD)^{-1}(\mD^T\vs_n + \rho(\vy_n^{(k)}  + \frac{\vgamma^{(k)}}{\rho}))
+\end{equation}
+
+$\mD$ is a very large matrix. This inverse is impractical to compute directly.
+
+Let's recall what $\mD$ is, though.
+
+\begin{equation}
+\begin{aligned}
+\mD = \begin{bmatrix} \mD_{1,1} & \hdots & \mD_{1,K} \\
+                      \vdots & \ddots & \vdots \\
+                      \mD_{C,1} & \hdots & \mD_{C,K}
+      \end{bmatrix}
+\end{aligned}
+\end{equation}
+
+
+where
+
+\begin{equation}
+\mD_{c,i} = \operatorname{circ}(\operatorname{pad}(\vk_{c,i}))
+\end{equation}
+
+We're in luck here. The vectors of the Fourier basis are eigenvectors of circulant matricies, and circulant matrices are diagonalizable.
+
+\begin{equation}
+\begin{aligned}
+\mD = \begin{bmatrix} \mathcal{F}^{-1}\hat{\mD}_{1,1}\mathcal{F} & \hdots & \mathcal{F}^{-1}\hat{\mD}_{1,K}\mathcal{F} \\
+                      \vdots & \ddots & \vdots \\
+                      \mathcal{F}^{-1}\hat{\mD}_{C,1}\mathcal{F} & \hdots & \mathcal{F}^{-1}\hat{\mD}_{C,K}\mathcal{F}
+      \end{bmatrix}
+\end{aligned}
+\end{equation}
+
+where $\hat{\mD}_{c,i}$ is diagonal.
+
+Now, let's pull the fourier transforms outside the dictionary matrix.
+
+\begin{equation}
+\begin{aligned}
+\hat{\mD} = \begin{bmatrix} \hat{\mD}_{1,1} & \hdots & \hat{\mD}_{1,K} \\
+                      \vdots & \ddots & \vdots \\
+                      \hat{\mD}_{C,1} & \hdots & \hat{\mD}_{C,K}
+      \end{bmatrix}
+\end{aligned}
+\end{equation}
+
+$\hat{\mD}$ is sparsely banded. Now, let's take a look at the matrix we are trying to invert.
+
+
+\begin{equation}
+\rho\mId + \mD^T\mD = \rho\mId + (\mathcal{F}^{-1}\hat{\mD}\mathcal{F})^T(\mathcal{F}^{-1}\hat{\mD}\mathcal{F})
+\end{equation}
+ 
+\begin{equation}
+\rho\mId + \mD^T\mD = \rho\mId + \mathcal{F}^{-1}\hat{\mD}^H\mathcal{F}\mathcal{F}^{-1}\hat{\mD}\mathcal{F}
+\end{equation}
+
+\begin{equation}
+\rho\mId + \mD^T\mD = \rho\mId + \mathcal{F}^{-1}\hat{\mD}^H\hat{\mD}\mathcal{F}
+\end{equation}
+
+Remember that $\mId = \mathcal{F}^{-1}\mathcal{F}$. So,
+
+\begin{equation}
+\rho\mId + \mD^T\mD = \mathcal{F}^{-1}(\rho\mId + \hat{\mD}^H\hat{\mD})\mathcal{F}
+\end{equation}
+
+\begin{equation}
+(\rho\mId + \mD^T\mD)^{-1} = \mathcal{F}^{-1}(\rho\mId + \hat{\mD}^H\hat{\mD})^{-1}\mathcal{F}
+\end{equation}
+
+Looking closely at $\hat{\mD}$ and $\hat{\mD}^H\hat{\mD}$ we can see that frequency bands do not interact. That is, if a row or column contains a DC (direct current aka zero-frequency) component of any filter, it contains no other frequency components from any filter. Therefore, we can split the inverse problem into a single $K \times K$ inverse computation for each pixel or element in the signal.
+
+Let $\hat{\mD}_{c,i}[j]$ be the $j$th diagonal element of $\hat{\mD}_{c,i}$. Then, let $\hat{\mD}[i]$ be the submatrix containing the $j$th diagonal elements for all channels and filters.
+
+The inverse we want to compute is $(\rho\mId + \hat{\mD}^H[j]\hat{\mD}[j])^{-1}$.
+
+Note that the rank of $\hat{\mD}^H[j]\hat{\mD}[j]$ is less than or equal to the number of channels. If this number is small, the inverse can be computed efficiently using the Woodbury matrix identity. Wikipedia has a great page on the Woodbury matrix identity if you are not familiar.
+
+If you are looking for more explanations or sources of what I've explained so far, \cite{bristow2013fast} uses ADMM for convolutional sparse coding, \cite{heide2015fast} and \cite{vsorel2016fast} exploit the sum-of-low-rank-and-identity nature of the matrix to be inverted, and \cite{wohlberg2016boundary} and \cite{heide2015fast} dicuss how to handle boundaries.
+
+But what if the number of channels is not small?
+
+\subsection{Coefficient Update for Multi-Channel Signals}
+
+If the number of channels is large, standard approaches offer two options (see \cite{garcia2018convolutional} (section VI)):
+\begin{enumerate}
+\item ADMM consensus:
+
+In the past I have used the subscript of the coefficients and signals to refer to the sample.  Here, assume sample $n$, because I need the subscript to indicate channel. In the first update equation, estimate coefficients separately for each channel. For the second update equation, combine the results to get a single set of coefficients.
+
+\begin{equation}
+f_c(\vx_c) = \frac{1}{2}\|\vs_c - \mD\vx_c\|_F^2
+\end{equation}
+
+\begin{equation}
+g(\vy) = \lambda\|\vy\|_1
+\end{equation}
+
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx_c,\vy} & \sum_{c = 1}^C f_c(\vx_c) + g(\vy)\\
+\text{subject to } & \vy - \vx_c = 0 & \forall c
+\end{aligned}
+\end{equation}
+
+The update equations become the following:
+
+Obviously, $C$ separate updates here.
+\begin{equation}
+\vx_c^{(k + 1)} = (\rho\mId + \mD_c^T\mD_c)^{-1}(\mD_c^T\vs_c + \rho(\vy^{(k)}  + \frac{\vgamma_c^{(k)}}{\rho}))
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)} = S_{\lambda}( \frac{1}{C}\sum_{c = 1}^C \vx_c^{(k + 1)} - \frac{\vgamma_c^{(k)}}{\rho})
+\end{equation}
+
+Obviously, $C$ separate updates here.
+\begin{equation}
+\vgamma_c^{(k + 1)} = \vgamma_c^{(k)} + \rho(\vy^{(k + 1)} - \vx_c^{(k + 1)})
+\end{equation}
+
+\item
+Alternatively, you can use the FISTA algorithm \cite{beck2009fast}.
+\end{enumerate}
+
+Now, here is my thought on all this. I think we can do better than FISTA or ADMM consensus.  When learning a dictionary using an online method, the dictionary will be updated frequently. What if we could figure out a way to make the updates for each frequency low rank? Then we could use the Sherman-Morrison formula to efficiently update our inverses! Alternatively, a low-rank approximation could suffice, but I'm less enthused about that approach.
+
+\section{The Dictionary Update}
+
+Most dictionary update approaches are batch methods (they handle the entire dataset at once.)
+
+
+Recall our minimization problem.
+
+\begin{equation}
+\begin{aligned}
+\min_{\mX,\mK} & \frac{1}{2}\|\mS - \mD\mX\|_F^2 + \lambda\|\mX\|_1\\
+\text{subject to } & \|\vk_i\|_2 \leq 1\\
+                   & \mD_{c,i} = \operatorname{circ}(\operatorname{pad}(\vk_{c,i}))
+\end{aligned}
+\end{equation}
+
+We are going to keep $\mX$ fixed, and update $\mD$.
+
+\begin{equation}
+\begin{aligned}
+\min_{\mK} & \frac{1}{2}\|\mS - \mD\mX\|_F^2\\
+\text{subject to } & \|\vk_i\|_2 \leq 1\\
+                   & \mD_{c,i} = \operatorname{circ}(\operatorname{pad}(\vk_{c,i}))
+\end{aligned}
+\end{equation}
+
+Before, we used the dictionary atom filters to generate circulant matrices for the dictionary. Now, we can do the same with the coefficients. To avoid confusion, we can call these coefficients $\mY$.
+
+I am flipping $n$ and $i$ for this.
+
+\begin{equation}
+\mY_{n,i} = \operatorname{circ}(\vx_{i,n})
+\end{equation}
+
+
+\begin{equation}
+\begin{aligned}
+\mY = \begin{bmatrix} \mY_{1,1} & \hdots & \mY_{1, K}\\
+                      \vdots & \ddots & \vdots \\
+                      \mY_{N,1} & \hdots & \mY_{N,K}
+      \end{bmatrix}
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\vd_c = \begin{bmatrix} \operatorname{pad}(\vk_{c,1}) \\
+                        \vdots \\
+                        \operatorname{pad}(\vk_{c,K})
+         \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vs_c = \begin{bmatrix} \operatorname{pad}(\vs_{c,1}) \\
+                        \vdots \\
+                        \operatorname{pad}(\vs_{c,N})
+         \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+\min_{\vd_{c,i}} & \frac{1}{2} \sum_{c = 1}^C\|\vs_c - \mY\vd_c\|_2^2\\
+\text{subject to } & \|\vk_{c,i}\|_2 \leq 1\\
+                   & \vd_{c,i} = \operatorname{pad}(\vk_{c,i})
+\end{aligned}
+\end{equation}
+
+The two constraints
+\begin{equation}
+\|\vk_{c,i}\|_2 \leq 1
+\end{equation}
+
+and 
+
+\begin{equation}
+\vd_{c,i} = \operatorname{pad}(\vk_{c,i})
+\end{equation}
+
+are convex constraints, the first normalizing the filter, and the second requiring the filters to be small/local. Let $T$ be the convex set the constraints require $\vd_{c,i}$ to be in.
+
+The simplest approach to an online algorithm is projected gradient descent.
+
+That would look like this:
+
+\begin{equation}
+\vd_c^{(k + 1)} = \operatorname{proj}_{T}(\vd_c^{(k)} - \alpha\mY_n^T(\mY_n\vd_{c}^{(k)} - \vs_n))
+\end{equation}
+
+where $\alpha$ is the step size.
+
+There are a couple variants of this, but ultimately things end up very similar. Add momentum, and you get the FISTA algorithm \cite{beck2009fast}. Include past coefficients in your gradient calculation before projection, and you get a second-order method \cite{liu2018first}.
+
+My question is, can we find an update close to this one that is low-rank for each frequency, for efficient inverse updates? It feels like there has to be a better approach to coefficient updates than FISTA or consensus ADMM when doing online dictionary learning for multi-channel data.
+
+\section{FISTA}
+
+I've mentioned the fast iterative shrinkage algorithm a few times, so I probably should go ahead and explain it.
+
+Suppose you have a two-term objective function $f(x) + g(x)$ and you want to minimize it.
+
+$f$ is easily differentiable, and g has a simple proximal operator.
+
+Definition of proximal operator:
+\begin{equation}
+\operatorname{prox}_g(x) = \arg \min_y \frac{1}{2}\|y - x\|_2^2 + g(y)
+\end{equation}
+
+Then, the iterative shrinkage thresholding algorithm (ISTA) goes like this:
+
+\begin{equation}
+\vx^{(k + 1)} = \operatorname{prox}_g(\vx^{(k)} - \alpha\nabla_{\vx}f(\vx^{(k)})
+\end{equation}
+
+Where $\alpha$ is step size for gradient steps.
+
+The fast iterative shrinkage thresholding algorithm (FISTA) just adds momentum to the mix.
+
+\begin{equation}
+\vy^{(k + 1)} = \operatorname{prox}_g(\vx^{(k)} - \alpha\nabla_{\vx}f(\vx^{(k)})
+\end{equation}
+
+\begin{equation}
+t^{(k + 1)} = \frac{1}{2} (1 + \sqrt{1 + 4(t^{(k)})^2})
+\end{equation}
+
+\begin{equation}
+\vx^{(k + 1)} = \vy^{(k + 1)} + \frac{t^{(k)} - 1}{t^{(k + 1)}}(z^{(k + 1)} - \vx^{(k)})
+\end{equation}
+
+The concept of momentum (in case you aren't familiar) is a gradient descent concept. Instead of computing the gradient at the current location, you compute the gradient a little further ahead.
+
+In the context of the equations above, think of $\vz$ as your current location, but $\vx$ as where you are looking for gradient information.
+
+\bibliography{onlineCDL-lrupdatesSources}
+\bibliographystyle{ieeetr}
+\end{document}

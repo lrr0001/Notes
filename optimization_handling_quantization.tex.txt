@@ -1,0 +1,153 @@
+This is the problem I'm trying to solve:
+
+\begin{equation}
+f(\vx) =  \frac{a}{2}\|\vx - \vz\|_2^2 + \frac{b}{2}\|\mP\vx - \mP\vs\|_2^2
+\end{equation}
+
+\begin{equation}
+\arg\min_{\vx} f(\vx)
+\end{equation}
+
+where $\mP$ is a nonlinear operator, specifically a quantized projection operator.
+
+That is, $\mP = \mW^T\operatorname{Quantize}\mW$, where $\mW^T\mW$ is a projection operator.
+
+\begin{equation}
+\operatorname{Quantize}(\vy) = \operatorname{round}(\vy/\vq)*\vq
+\end{equation}
+
+In an early attempt to solve my problem, I pretended $\mP$ was a linear projection operator and came up with an approximate solution to my original problem.
+
+\begin{equation}
+\vx_{\text{approx}} = \vz + \frac{b}{a + b}(\mP\vs - \mP\vz)
+\end{equation}
+
+Now, plugging $\vx = \vx_{\text{\approx}} + \Delta\vx$ back into the original equation, I have the expression:
+\begin{equation}
+f(\vx_{\text{\approx}} + \Delta\vx) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vz) + \Delta\vx\|_2^2 + \frac{b}{2}\|\mP(\vz + \frac{b}{a + b}(\mP\vs - \mP\vz) + \Delta\vx) - \mP\vs\|_2^2
+\end{equation}
+
+
+In analyzing this expression, I have found it helpful to define a function $\epsilon(\Delta\vx)$:
+\begin{equation}
+\epsilon(\Delta\vx) = \mP(\vz + \frac{b}{a + b}(\mP\vs - \mP\vz) + \Delta\vx) - \mP\vz - \frac{b}{a + b}(mP\vs - \mP\vz)
+\end{equation}
+
+\begin{equation}
+\mP(\vz + \frac{b}{a + b}(\mP\vs - \mP\vz) + \Delta\vx) = \mP\vz - \frac{b}{a + b}(mP\vs - \mP\vz) +\epsilon(\Delta\vx)
+\end{equation}
+
+Returning to the objective function:
+\begin{equation}
+f(\vx_{\text{\approx}} + \Delta\vx) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vz) + \Delta\vx\|_2^2 + \frac{b}{2}\|\mP\vz - \frac{b}{a + b}(mP\vs - \mP\vz) +\epsilon(\Delta\vx) - \mP\vs\|_2^2
+\end{equation}
+
+Simplifying
+\begin{equation}
+f(\vx_{\text{\approx}} + \Delta\vx) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vz) + \Delta\vx\|_2^2 + \frac{b}{2}\|-\frac{a + b}{a + b}(\mP\vs - \mP\vz) + \frac{b}{a + b}(mP\vs - \mP\vz) +\epsilon(\Delta\vx)\|_2^2
+\end{equation}
+
+\begin{equation}
+f(\vx_{\text{\approx}} + \Delta\vx) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vz) + \Delta\vx\|_2^2 + \frac{b}{2}\|- \frac{a}{a + b}(mP\vs - \mP\vz) +\epsilon(\Delta\vx)\|_2^2
+\end{equation}
+
+I have $2$ objective terms, and it will help to give them names:
+\begin{equation}
+f_1(\Delta\vx) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vz) + \Delta\vx\|_2^2
+\end{equation}
+
+\begin{equation}
+f_2(\Delta\vx) = \frac{b}{2}\|- \frac{a}{a + b}(mP\vs - \mP\vz) +\epsilon(\Delta\vx)\|_2^2
+\end{equation}
+
+\begin{equation}
+f(\vx) = f_1(\vx - \vx_{\text{approx}}) + f_2(\vx - \vx_{\text{\approx}})
+\end{equation}
+
+Now for some observations:
+\begin{enumerate}
+\item
+Adding a component to $\Delta\vx$ that is orthogonal to the span of the columns of $\mW^T$ increases the first term of the objective $f_1$ without affecting the second term $f_2$.
+\begin{equation}
+f_1(\Delta\vx) \geq f_1(\mW^T\mW\Delta\vx)
+\end{equation}
+
+\begin{equation}
+f_2(\Delta\vx) = f_2(\mW^T\mW\Delta\vx)
+\end{equation}
+
+Therefore,
+\begin{equation}
+(\mId - \mW^T\mW)(\Delta\vx)_{\text{optimal}} = 0
+\end{equation}
+
+\item
+In the simplified case of no quantization $\mP = \mW^T\mW$:
+\begin{equation}
+\epsilon(\Delta\vx) = \mW^T\mW\Delta\vx
+\end{equation}
+
+And so, if the quantization process is removed,
+\begin{equation}
+(\Delta\vx)_{\text{optimal}} = 0
+\end{equation}
+
+\item
+For $\alpha \in \[0,1]$:
+\begin{equation}
+f_2(\alpha\epsilon(0)) = f_2(0)
+\end{equation}
+
+Furthermore, this is true even if I scale elements of $\mW\epsilon(0)$ individually:
+For $\alpha_i \in \[0,1]$:
+\begin{equation}
+f_2(\mW^T\operatorname{diag}(\valpha)\mW\epsilon(0)) = f_2(0)
+\end{equation}
+
+\item
+There are certain choices for $\valpha$ from the previous observation that will decrease the first objective term $f_1$:
+
+\begin{equation}
+\alpha_i = \begin{cases} 1 & \operatorname{sign}(\ve_i^T\mW\epsilon(0)) = -\operatorname{sign}(\ve_i^T\mW(\mP\vs - \mP\vz)) \\
+                         0 & \text{otherwise}
+           \end{cases}
+\end{equation}
+Using the $\valpha$ defined above:
+\begin{equation}
+f_1(\mW^T\operatorname{diag}(\valpha)\mW\epsilon(0)) \leq f_1(0)
+\end{equation}
+
+\item
+The last couple of operations have focused on decreasing $f_1$ without affecting $f_2$. Here, I observe it is also possible to select a $\Delta\vx$ that deceases $f_2$ by more than it decreases $f_1$.
+
+\begin{equation}
+\beta_i = \begin{cases} 1 + \nu  & \operatorname{sign}(\ve_i^T\mW\epsilon(\vq/2)) = \operatorname{sign}(\ve_i^T\mW(\mP\vs - \mP\vz)) \neq 0 \\
+                         0 & \text{otherwise}
+           \end{cases}
+\end{equation}
+where $\nu$ is an arbitrarily small number to ensure the rounding occurs in the proper direction.
+
+Using the $\vbeta$ defined above:
+\begin{equation}
+f_1(\mW^T\operatorname{diag}(\vbeta)\mW\epsilon(\frac{\mW^T\vq}{2})) - f_1(0) \leq f_2(0) - f_2(\mW^T\operatorname{diag}(\vbeta)\mW\epsilon(\frac{\mW^T\vq}{2}))
+\end{equation}
+
+\item
+Finally, the last couple observations can be combined for the optimal solution:
+\begin{equation}
+(\Delta\vx)_{\text{optimal}} = \mW^T\operatorname{diag}(\vbeta)\mW\epsilon(\frac{\mW^T\vq}{2}) + \mW^T\operatorname{diag}(\valpha)\mW\epsilon(0)
+\end{equation}
+
+where
+
+\begin{equation}
+\alpha_i = \begin{cases} 1 & \operatorname{sign}(\ve_i^T\mW\epsilon(0)) = -\operatorname{sign}(\ve_i^T\mW(\mP\vs - \mP\vz)) \\
+                         0 & \text{otherwise}
+           \end{cases}
+\end{equation}
+
+\begin{equation}
+\beta_i = \begin{cases} 1 + \nu  & \operatorname{sign}(\ve_i^T\mW\epsilon(\vq/2)) = \operatorname{sign}(\ve_i^T\mW(\mP\vs - \mP\vz)) \neq 0 \\
+                        0 & \text{otherwise}
+          \end{cases}
+\end{equation}

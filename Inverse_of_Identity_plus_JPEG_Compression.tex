@@ -1,0 +1,92 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+The JPEG compression algorithm consists of $5$ steps:
+\begin{enumerate}
+\item Convert from RGB to YUV
+\item Downsample (with LPF) the U and V channels
+\item Compute cosine transform (type II) of $8 \times 8$ blocks for each channel
+\item Quantize
+\item Efficiently encode quantized data
+\end{enumerate}
+
+Similarly, the JPEG reconstruction algorithm has $4$ steps:
+\begin{enumerate}
+\item Decode quantized data
+\item Compute inverse cosine transform (type II) of $8 \times 8$ blocks for each channel
+\item Upsample (with LPF) the u and V channels
+\item convert from RGB to YUV
+\end{enumerate}
+
+The encoding/decoding process is lossless, and for my purposes can be safely ignored.
+
+Consider an image that was compressed and then reconstructed. If it is then compressed and reconstructed again using the same quantization (with the right choice of LPF), the image will remain unchanged. That is, compressing and reconstructing an image a second time does not cause further distortion.
+
+Let $\mP$ be the operation of compressing and image, and then reconstructing it.  What is the inverse of $a\mId + b\mP$? There is a simple, closed-form solution:
+
+\begin{equation}
+(a\mId + b\mP)^{-1} = \frac{1}{a}\mId - \frac{b}{a^2 + ab}\mP
+\end{equation}
+
+Proof:
+First, I will show it is a right-side inverse.
+\begin{equation}
+(a\mId + b\mP)(\frac{1}{a}\mId - \frac{b}{a^2 + ab}\mP) = \mId - \frac{b}{a + b}\mP + \frac{b}{a}\mP - \frac{b^2}{a^2 + ab}\mP\mP
+\end{equation}
+
+Recall that $\mP\mP = \mP$.
+
+\begin{equation}
+(a\mId + b\mP)(\frac{1}{a}\mId - \frac{b}{a^2 + ab}\mP) = \mId  - \frac{b}{a + b}\mP + \frac{b}{a}\mP - \frac{b^2}{a^2 + ab}\mP
+\end{equation}
+
+\begin{equation}
+(a\mId + b\mP)(\frac{1}{a}\mId - \frac{b}{a^2 + ab}\mP) = \mId  - \frac{ab}{a^2 + ab}\mP + \frac{ab + b^2}{a^2 + ab}\mP - \frac{b^2}{a^2 + ab}\mP
+\end{equation}
+
+\begin{equation}
+(a\mId + b\mP)(\frac{1}{a}\mId - \frac{b}{a^2 + ab}\mP) = \mId
+\end{equation}
+
+Now, I will show it is a left-side inverse.
+\begin{equation}
+(\frac{1}{a}\mId - \frac{b}{a^2 + ab}\mP)(a\mId + b\mP) = \mId + \frac{b}{a}\mP - \frac{b}{a + b}\mP - \frac{b^2}{a^2 + ab}\mP
+\end{equation}
+
+It's the exact same terms as before, so the result is the same:
+\begin{equation}
+(\frac{1}{a}\mId - \frac{b}{a^2 + ab}\mP)(a\mId + b\mP) = \mId
+\end{equation}
+
+Of course, starting with the result does not demonstrate how I found this expression for the inverse.  This is how I found it:
+
+\begin{equation}
+a\mId + b\mP  = a(\mId - \mP + \mP) + b\mP
+\end{equation}
+
+\begin{equation}
+a\mId + b\mP = a(\mId - \mP) + (a + b)\mP
+\end{equation}
+
+Now, I treat $\mId - \mP$ and $\mP$ like orthogonal projections (even though both are actually nonlinear operators):
+
+\begin{equation}
+(a\mId + b\mP)^{-1} = \frac{1}{a}(\mId - \mP) + \frac{1}{a + b}\mP
+\end{equation}
+
+\begin{equation}
+(a\mId + b\mP)^{-1} = \frac{1}{a}\mId + (\frac{1}{a + b} - \frac{1}{a})\mP
+\end{equation}
+
+\begin{equation}
+(a\mId + b\mP)^{-1} = \frac{1}{a}\mId + (\frac{a}{a^2 + ab} - \frac{a + b}{a^2 + ab})\mP
+\end{equation}
+
+\begin{equation}
+(a\mId + b\mP)^{-1} = \frac{1}{a}\mId - \frac{b}{a^2 + ab}\mP
+\end{equation}
+\end{document}

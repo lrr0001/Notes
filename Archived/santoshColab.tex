@@ -1,0 +1,99 @@
+\documentclass{article}
+\usepackage{amsmath}
+\begin{document}
+
+\section{Dictionary Model}
+
+We model a signal as a linear combination of dictionary atoms.
+
+\begin{equation}
+\vs = \mD\vx = \sum_{i} x_i\vd_i + \vepsilon
+\end{equation}
+
+\section{Convolutional Dictionary Model}
+
+We model a signal as a sum of convolutions. $\vx_i$ are coefficients. $\vk_i$ are dictionary atom filters.
+
+\begin{equation}
+\vs = \vepsilon + \sum_{i} \vx_i * \vk_i
+\end{equation}
+
+On the surface, convolutional dictionary models look like a generalization of dictionary models.
+
+In fact, convolutional dictionary models ARE dictionary models. The concept is easier explained visually, so I will leave that to supporting slides.  Point is, we can rewrite the equation in the form of a dictionary model. The columns $\mD_i$ are the dictionary atoms corresponding to dictionary atom filter $\vk_i$. The coefficients $\vx_i$ are the coefficients corresponding to dictionary atom filter $\vk_i$.
+
+
+\begin{equation}
+\mD = \begin{bmatrix} \mD_1 & \hdots & \mD_K \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vx = \begin{bmatrix} \vx_1 \\
+                      \hdots \\ 
+                      \vx_K 
+      \end{bmatrix}
+\end{equation}
+
+
+\begin{equation}
+\vs = \vepsilon + \mD\vx
+\end{equation}
+
+
+
+Now, only a slight adjustment is necessary to handle multiple channels and multiple signals.
+
+$C$ is the number of channels.
+$N$ is the number of samples.
+$\vs_{i,j}$ is the $i$th channel of the $j$th sample signal.
+
+\begin{equation}
+\begin{aligned}
+\mS = \begin{bmatrix} \vs_{1,1} & \hdots & \vs_{1,N} \\
+                      \vdots & \ddots & \vdots \\
+                      \vs_{C,1} & \hdots & \vs_{C,N}
+      \end{bmatrix}
+\end{aligned}
+\end{equation}
+
+$\mD_{i,j}$ is the $i$th channel of subdictionary corresponding to the $j$th dictionary atom filter.
+
+\begin{equation}
+\begin{aligned}
+\mD = \begin{bmatrix} \mD_{1,1} & \hdots & \mD_{1,K} \\
+                      \vdots & \ddots & \vdots \\
+                      \mD_{C,1} & \hdots & \mD_{C,K}
+      \end{bmatrix}
+\end{aligned}
+\end{equation}
+
+$\vx_{i,j}$ is the coefficients corresponding to the $i$th dictionary atom filter for the $j$th sample.
+
+\begin{equation}
+\vx = \begin{bmatrix} \vx_{1,1} & \hdots & \vx_{1,N} \\
+                      \vdots & \ddots & \vdots \\ 
+                      \vx_{K,1} & \hdots & \vx_{K,N} 
+      \end{bmatrix}
+\end{equation}
+
+Finally, we have the full equation:
+
+\begin{equation}
+\mS \approx \mD\mX
+\end{equation}
+
+\section{Dictionary Learning Overview}
+
+Using the dictionary $\mD$ constructed from dictionary atom filters $\mk_i$, dictionary learning can be thought of as the following minimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\mX,\mK} & \frac{1}{2}\|\mS - \mD\mX\|_F^2 + \lambda\|\mX\|_1\\
+\text{subject to } & \|\vk_i\|_2 \leq 1
+\end{aligned}
+\end{equation}
+
+Solving this jointly is just too hard. So, instead, we alternate updates of $\mD$ for fixed $\mX$ and updates for $\mX$ for fixed $\mD$.
+
+
+\end{document}

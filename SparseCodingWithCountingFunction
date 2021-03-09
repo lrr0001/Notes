@@ -1,0 +1,6 @@
+\begin{equation}
+\begin{align}
+& \minimize_{\valpha}  && \frac{1}{2}\|s - \mM\sum_{i = 1}^K \vd_i * \alpha_i\|_2^2 \\
+&& \text{subject to} & \|\alpha\|_0 \leq \tau
+\end{align}
+\end{equation}

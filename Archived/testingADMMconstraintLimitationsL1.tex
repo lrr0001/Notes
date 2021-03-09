@@ -1,0 +1,93 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+Consider the optimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{x,w,z} & |w| + \lambda|z| \\
+\text{subject to } & z - x = 0 \\
+                   & w - ax = -b
+\end{aligned}
+\end{equation}
+
+We can rewrite this optimization problem in the following manner:
+
+\begin{equation}
+
+\vy = \begin{bmatrix} z \\ w \end{bmatrix}
+
+\end{equation}
+
+\begin{equation}
+
+\mA = \begin{bmatrix} -1 \\ -a \end{bmatrix}
+
+\end{equation}
+
+\begin{equation}
+
+\mB = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+
+\end{equation}
+
+\begin{equation}
+
+\vc = \begin{bmatrix} 0 \\ -b \end{bmatrix}
+
+\end{equation}
+
+\begin{equation}
+
+\ve_0 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}
+
+\end{equation}
+
+\begin{equation}
+
+\ve_1 = \begin{bmatrix} 0 \\ 1 \end{bmatrix}
+
+\end{equation}
+
+Then, we can rewrite the optimization problem as the following:
+
+\begin{equation}
+\begin{aligned}
+\min_{x,\vy} & |\ve_1^T\vy| + \lambda|\ve_0^T\vy| \\
+\text{subject to } & \mA\vx + \mB\vy = \vc
+\end{aligned}
+\end{equation}
+
+This produces the following augmented Lagrangian function:
+
+\begin{equation}
+\operatorname{L}_{\rho}(x,\vy,\vu} = |\ve_1^T\vy| + \lambda|\ve_0^T\vy| + \frac{\rho}{2}\|\mA\vx + \mB\vy - \vc + \vu\|_2^2
+\end{equation}
+
+To get the $x$-update, I need to compute the partial derivative of the augmented Lagrangian in respect to $x$.
+
+\begin{equation}
+\frac{\partial}{\partial x} \operatorname{L}_{\rho}(x,\vy,\vu) = \rho(\mA^H\mA\vx + \mA^H(\mB\vy - \vc + \vu))
+\end{equation}
+
+Then, I must set the partial derivative of the augmented Lagrangian equal to zero and solve for $x$.
+
+\begin{equation}
+x^{(k + 1)} = (\mA^H\mA)^{-1}\mA^H(\mB\vy^{(k)} - \vc^{(k)} + \vu^{(k)})
+\end{equation}
+
+The $\vy$ update is the following:
+
+\begin{equation}
+\vy^{(k + 1)} \operatorname{S}_{\frac{1}{\rho} \begin{bmatrix} \lambda \\ 1  \end{bmatrix}}(-\mA x^{(k + 1)} + \vc - \vu^{(k)})
+\end{equation}
+
+
+Tests of this program show convergence. The multiple linear equality constraints are not an obstacle.
+
+\end{document}

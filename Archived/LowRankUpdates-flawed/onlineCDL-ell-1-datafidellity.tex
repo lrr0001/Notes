@@ -1,0 +1,83 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+Consider the optimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx,\vy,\vz} & \|\vy\|_1 + \lambda\|\vz\|_1 \\
+\text{subject to } & \vz - \vx = 0 \\
+                   & \vy - (\vs -\mD\vx) = 0
+\end{aligned}
+\end{equation}
+
+This optimization problem has the Lagrangian function:
+
+\begin{equation}
+\operatorname{L}(\vx,\vy,\vz,\vgamma,\veta) \|\vy\|_1 + \lambda\|\vz\|_1 + \vgamma^H(\vz - \vx) + \veta^H(\vy - \vs + \mD\vx)
+\end{equation}
+
+Now, we can augment the Lagrangian. I will use the modification from the normalization document in my notes for one of the augmentation terms.
+
+\begin{equation}
+\operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = \|\vy\|_1 + \lambda\|\vz\|_1 + \vgamma^H(\vz - \vx) + \veta^H(\vy - \vs + \mD\vx) + \frac{\rho}{2}\|\mLambda^{\frac{1}{2}}(\vz - \vx)\|_2^2 + \frac{\rho}{2}\|\vy - \vs + \mD\vx\|_2^2
+\end{equation}
+
+\begin{equation}
+\nabla_{\vx}\operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = -\vgamma - \mD^H\veta + \rho\mLambda\vx - \rho\mLambda\vz + \rho\mD^H\mD\vx - \rho\mD^H(\vy - \vs)
+\end{equation}
+
+\begin{equation}
+\min_{\vx} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = (\rho\mLambda + \rho\mD^H\mD)^{-1}(\rho\mD^H(\vy - \vs + \frac{\veta}{\rho}) + \rho\mLambda\vz + \vgamma)
+\end{equation}
+
+\begin{equation}
+\min_{\vx} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = (\mLambda + \mD^H\mD)^{-1}(\mD^H(\vy - \vs + \frac{\veta}{\rho}) + \mLambda\vz + \frac{\vgamma}{\rho})
+\end{equation}
+
+\begin{equation}
+\min_{\vy} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = \operatorname{S}_{\frac{1}{\rho}}(\vs - \mD\vx - \frac{\veta}{\rho})
+\end{equation}
+
+\begin{equation}
+\min_{\vz} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = \operatorname{S}_{\frac{\lambda\mLambda^{-1}}{\rho}}(\vx - \frac{\mLambda^{-1}\vgamma}{\rho})
+\end{equation}
+
+From this, we can get the update equations:
+\begin{equation}
+\vx^{(k + 1)} = (\mLambda + \mD^H\mD)^{-1}(\mD^H(\vy^{(k)} - \vs + \frac{\veta^{(k)}}{\rho}) + \mLambda\vz^{(k)} + \frac{\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)}= \operatorname{S}_{\frac{1}{\rho}}(\vs - \mD\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vz^{(k + 1)}= \operatorname{S}_{\frac{\lambda\mLambda^{-1}}{\rho}}(\vx^{(k + 1)} - \frac{\mLambda^{-1}\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vgamma^{(k + 1)} = \vgamma^{(k)} + \rho\mLambda(\vz^{(k + 1)} - \vx^{(k + 1)})
+\end{equation}
+
+\begin{equation}
+\veta^{(k + 1)} = \veta^{(k)} + \rho(\vy^{(k + 1)} - \vs + \mD\vx^{(k + 1)})
+\end{equation}
+
+For mask decoupling, only one change is needed:
+
+\begin{equation}
+\vy^{(k + 1)}= \begin{cases}
+\operatorname{S}_{\frac{1}{\rho}}(\vs - \mD\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho}) & \text{inside signal domain} \\
+\vs - \mD\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+
+
+\end{document}

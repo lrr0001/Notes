@@ -1,0 +1,44 @@
+Working on the low-rank update problem.
+
+
+The linear contraint requires the dictionary to live in a subspace. Let $\vf_{i,j}^1$ and $\vf_{i,j}^2$ span that subspace.
+
+Consider the problem of approximating the update $\mD_1$, $\mD_2$, $\mD_3$, where $\mD_i$ is the $i$th frequency.
+
+Let 
+\begin{equation}
+\vf^1 = \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vf^2 = \begin{bmatrix} 0 \\ 1 \\ -1 \end{bmatrix}
+\end{equation}
+
+I ignore channel and filter here, because the same requirements apply to all channels and filters.
+
+Then, we find ourselves with the following problem
+
+\begin{equation}
+\begin{aligned}
+\min_{\mA_1,\mA_2} & \|\mD_1 - \mA_1\|_F^2 \|\mD_2 - \mA_2\|_F^2 \|\mD_3 - \mA_1 + \mA_3\|_F^2\\
+\text{subject to } & \operatorname{rank}(\mA_1) \leq 1\\
+                   & \operatorname{rank}(\mA_2) \leq 1\\
+                   & \operatorname{rank}(\mA_3) \leq 1
+\end{aligned}
+\end{equation}
+
+Now, suppose $\operatorname{rank}(\mA_1) = 1$ and $\operatorname{rank}(\mA_2) = 1$.
+
+Then, either
+
+\begin{equation}
+\operatorname{rank}(\begin{bmatrix} \mA_1 & \mA_2 \end{bmatrix}) = 1
+\end{equation}
+
+or
+
+\begin{equation}
+\operatorname{rank}(\begin{bmatrix} \mA_1 \\ \mA_2 \end{bmatrix}) = 1
+\end{equation}
+
+That is, either all rows or all columns are linearly dependent. Since this is necessary in such a simple case and sufficient in the more general case, it is likely necessary and sufficient for our low-rank update problem.

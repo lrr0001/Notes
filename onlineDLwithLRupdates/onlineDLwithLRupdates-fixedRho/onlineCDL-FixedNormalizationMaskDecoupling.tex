@@ -1,0 +1,183 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+Consider the optimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx,\vy,\vz} & \frac{1}{2}\|\vy -\mD\vx\|_2^2 + \lambda\|\vz\|_1 \\
+\text{subject to } & \mR^{-1}\vz - \mR^{-1}\vx = 0 \\
+                   &  \mW(\vs - \vy) = 0
+\end{aligned}
+\end{equation}
+
+This optimization problem has the Lagrangian function:
+
+\begin{equation}
+\operatorname{L}(\vx,\vy,\vz,\vgamma,\veta) = \frac{1}{2}\|\vy - \mD\vx\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H\mR^{-1}(\vz - \vx) + \veta^H\mW(\vs - \vy)
+\end{equation}
+
+Now, we can augment the Lagrangian.
+
+\begin{equation}
+\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \frac{1}{2}\|\vy - \mD\vx\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H\mR^{-1}(\vz - \vx) + \veta^H\mW(\vs - \vy) + \frac{\rho}{2}\|\mR^{-1}(\vz - \vx)\|_2^2 + \frac{\rho}{2}\|\mW(\vs - \vy)\|_2^2
+\end{equation} 
+
+\begin{equation}
+\nabla_{\vx}\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = -\mR^{-1}\vgamma - \mD^H\vy + \mD^H\mD\vx + \rho\mR^{-2}\vx - \rho\mR^{-2}\vz
+\end{equation}
+
+For $\vx,\vy,\vz,\veta,\vgamma$ such that $\nabla_{\vx}\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = 0$:
+
+\begin{equation}
+(\mR^{-2} + \frac{\mD^H\mD}{\rho})\vx = \mR^{-2}\vz + \frac{\mR^{-1} \vgamma}{\rho} + \frac{\mD^H\vy}{\rho}
+\end{equation}
+
+\begin{equation}
+\mR^{-1}(\rho\mId + (\mD\mR)^H(\mD\mR))\mR^{-1}\vx = \rho\mR^{-2}\vz + \mR^{-1}\vgamma + \mD^H\vy
+\end{equation}
+
+\begin{equation}
+(\rho\mId + (\mD\mR)^H(\mD\mR))\mR^{-1}\vx = \rho\mR^{-1}\vz + \vgamma + (\mD\mR)^H\vy
+\end{equation}
+
+\begin{equation}
+\mR^{-1}\vx = (\rho\mId + (\mD\mR)^H(\mD\mR))^{-1}(\rho\mR^{-1}\vz + \vgamma + (\mD\mR)^H\vy)
+\end{equation}
+
+\begin{equation}
+\min_{\vx} \operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \mR(\rho\mId + (\mD\mR)^H(\mD\mR))^{-1}(\rho\mR^{-1}\vz + \vgamma + (\mD\mR)^H\vy)
+\end{equation}
+
+\begin{equation}
+\nabla_{\vy}\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \vy - \mD\vx - \mW^H\veta + \rho\mW^H\mW\vy - \rho\mW^H\mW\vs
+\end{equation}
+
+\begin{equation}
+\min_{\vy} \operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = (\mId + \rho\mW^T\mW)^{-1}(\rho\mW^H\mW\vs + \mW^H\veta +\mD\vx)
+\end{equation}
+
+\begin{equation}
+\min_{\vy} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = \begin{cases}
+\frac{1}{1 + \rho}(\rho\vs + \mD\vx + \veta) & \text{within signal domain}\\
+\mD\vx & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\min_{\vz} \operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \operatorname{S}_{\frac{\lambda\mR^2}{\rho}}(\vx - \frac{\mR\vgamma}{\rho})
+\end{equation}
+
+From this, we can get the update equations:
+\begin{equation}
+\vx^{(k + 1)} = \mR(\rho\mId + (\mD\mR)^H(\mD\mR))^{-1}(\rho\mR^{-1}\vz^{(k)} + \vgamma^{(k)} + (\mD\mR)^H\vy^{(k)})
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)}= \begin{cases}
+\frac{1}{1 + \rho}(\rho\vs + \mD\vx^{(k + 1)} + \veta^{(k)}) & \text{within signal domain}\\
+\mD\vx^{(k + 1)} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\vz^{(k + 1)}= \operatorname{S}_{\frac{\lambda\mR^2}{\rho}}(\vx^{(k+1)} - \frac{\mR\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vgamma^{(k + 1)} = \vgamma^{(k)} + \rho\mR^{-1}(\vz^{(k + 1)} - \vx^{(k + 1)})
+\end{equation}
+
+\begin{equation}
+\veta^{(k + 1)} = \veta^{(k)} + \rho(\mW(\vs - \vy^{(k + 1)}))
+\end{equation}
+
+However, these equations will be simpler using slightly different updates.
+
+\begin{equation}
+\mR^{-1}\vx^{(k + 1)} = (\rho\mId + (\mD\mR)^H(\mD\mR))^{-1}(\rho\mR^{-1}\vz^{(k)} + \vgamma^{(k)} + (\mD\mR)^H\vy^{(k)})
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)}= \begin{cases}
+\frac{1}{1 + \rho}(\rho\vs + \mD\mR\mR^{-1}\vx^{(k + 1)} + \veta^{(k)}) & \text{within signal domain}\\
+\mD\mR\mR^{-1}\vx^{(k + 1)} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\mR^{-1}\vz^{(k + 1)}= \operatorname{S}_{\frac{\lambda\mR}{\rho}}(\mR^{-1}\vx^{(k+1)} - \frac{\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vgamma^{(k + 1)} = \vgamma^{(k)} + \rho(\mR^{-1}\vz^{(k + 1)} - \mR^{-1}\vx^{(k + 1)})
+\end{equation}
+
+\begin{equation}
+\veta^{(k + 1)} = \veta^{(k)} + \rho(\mW(\vs - \vy^{(k + 1)}))
+\end{equation}
+
+
+In the above equations, the dictionary never appears unscaled (without $\mR$), and the coefficients are always scaled by $\mR^{-1}$. Unfortunately,  $\mR$ still must be calculated for the $\vz$-update.
+
+For reference while coding, I would like to adjust into SPORCO package notation. I can add an $S$ subscript to prevent confusion.
+
+\begin{equation}
+\vx_S^{(k)} = \mR^{-1}\vx^{(k)}
+\end{equation}
+
+\begin{equation}
+\vy_S^{(k)} = \begin{bmatrix} \mW^H\vy^{(k)} \\ \mR^{-1}\vz^{(k)} \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vu_S^{(k)} = \begin{bmatrix} \mW^H\veta^{(k)} \\ \vgamma^{(k)} \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mA_S = \begin{bmatrix} \vzero \\ -\mId \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mB_S = \begin{bmatrix} -\mId & \vzero \\ \vzero & \mId \end{bmatrix} = \begin{bmatrix} -\mP_0 & \mP_1 \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mC_S = \begin{bmatrix} -\vs \\ \vzero \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mQ_S = \rho\mId + (\mD\mR)^H(\mD\mR)
+\end{equation}
+
+\begin{equation}
+\mD_S = \mD\mR
+\end{equation}
+
+
+
+\begin{equation}
+\vx_S^{(k + 1)} = \mQ_S^{-1}(\rho\mP_1\vy_S^{(k)} + \mP_1\vu_S^{(k)} + \mD_S^H\mP_0\vy_S^{(k)})
+\end{equation}
+
+\begin{equation}
+\vy_S^{(k + 1)} = \begin{bmatrix}
+\begin{cases}
+\frac{1}{1 + \rho}(\rho\vs + \mD_S\vx_S^{(k + 1)} + \mP_0\vu_S^{(k)}) & \text{within signal domain}\\
+\mD_S\vx_S^{(k + 1)} & \text{outside signal domain}
+\end{cases} \\
+\operatorname{S}_{\frac{\lambda\mR}{\rho}}(\vx_S^{(k+1)} - \frac{\mP_1\vu_S^{(k)}}{\rho})
+\end{bmatrix}
+\end{equation}
+
+
+\begin{equation}
+\vu_S^{(k + 1)} = \vu_S^{(k)} + \rho(\mA_S\vx_S^{(k + 1)} + \mB_S\vy_S^{(k + 1)} - \mC_S)
+\end{equation}
+
+\end{document}

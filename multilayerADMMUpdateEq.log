@@ -1,0 +1,291 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.10.13)  3 MAR 2021 11:10
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**multilayerADMMUpdateEq.tex
+(./multilayerADMMUpdateEq.tex
+LaTeX2e <2016/02/01>
+Babel <3.9q> and hyphenation patterns for 81 language(s) loaded.
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2016/03/03 v2.15a AMS math features
+\@mathmargin=\skip43
+
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks14
+\ex@=\dimen103
+))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen104
+)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 1999/12/14 v2.01 operator names
+)
+\inf@bad=\count87
+LaTeX Info: Redefining \frac on input line 199.
+\uproot@=\count88
+\leftroot@=\count89
+LaTeX Info: Redefining \overline on input line 297.
+\classnum@=\count90
+\DOTSCASE@=\count91
+LaTeX Info: Redefining \ldots on input line 394.
+LaTeX Info: Redefining \dots on input line 397.
+LaTeX Info: Redefining \cdots on input line 518.
+\Mathstrutbox@=\box26
+\strutbox@=\box27
+\big@size=\dimen105
+LaTeX Font Info:    Redeclaring font encoding OML on input line 630.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 631.
+\macc@depth=\count92
+\c@MaxMatrixCols=\count93
+\dotsspace@=\muskip10
+\c@parentequation=\count94
+\dspbrk@lvl=\count95
+\tag@help=\toks15
+\row@=\count96
+\column@=\count97
+\maxfields@=\count98
+\andhelp@=\toks16
+\eqnshift@=\dimen106
+\alignsep@=\dimen107
+\tagshift@=\dimen108
+\tagwidth@=\dimen109
+\totwidth@=\dimen110
+\lineht@=\dimen111
+\@envbody=\toks17
+\multlinegap=\skip44
+\multlinetaggap=\skip45
+\mathdisplay@stack=\toks18
+LaTeX Info: Redefining \[ on input line 2735.
+LaTeX Info: Redefining \] on input line 2736.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty
+Package: bm 2014/10/28 v1.1c Bold Symbol Support (DPC/FMi)
+\symboldoperators=\mathgroup4
+\symboldletters=\mathgroup5
+\symboldsymbols=\mathgroup6
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 141.
+LaTeX Info: Redefining \bm on input line 207.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/bbm-macros/bbm.sty
+Package: bbm 1999/03/15 V 1.2 provides fonts for set symbols - TH
+LaTeX Font Info:    Overwriting math alphabet `\mathbbm' in version `bold'
+(Font)                  U/bbm/m/n --> U/bbm/bx/n on input line 33.
+LaTeX Font Info:    Overwriting math alphabet `\mathbbmss' in version `bold'
+(Font)                  U/bbmss/m/n --> U/bbmss/bx/n on input line 35.
+)
+(./defs-OCDL-LRU.tex) (./multilayerADMMUpdateEq.aux)
+\openout1 = `multilayerADMMUpdateEq.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+
+Overfull \hbox (0.41687pt too wide) detected at line 41
+\OMS/cmsy/m/n/10 r[] [][]\OT1/cmr/m/n/10 (\OML/cmm/b/it/10 x\OML/cmm/m/it/10 ; 
+\OML/cmm/b/it/10 z\OML/cmm/m/it/10 ; \OML/cmm/b/it/10 ^^M\OT1/cmr/m/n/10 ) = \O
+ML/cmm/m/it/10 ^^V[]\OML/cmm/b/it/10 D[]D[]x[] \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/
+it/10 ^^V[]\OML/cmm/b/it/10 D[]z[] \OT1/cmr/m/n/10 + \OML/cmm/m/it/10 ^^Z\OT1/c
+mr/m/n/10 (\OML/cmm/m/it/10 ^^V[]\OML/cmm/b/it/10 R[]x \OMS/cmsy/m/n/10 ^^@ \OM
+L/cmm/m/it/10 ^^V[]\OML/cmm/b/it/10 R[]z[] \OMS/cmsy/m/n/10 ^^@ []\OT1/cmr/m/n/
+10 )
+ []
+
+[1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \hbox (25.40474pt too wide) detected at line 85
+\OMS/cmsy/m/n/10 r[][]\OT1/cmr/m/n/10 (\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OM
+L/cmm/m/it/10 i\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10 ^^@ \OT1/cmr/m/n/10 (\OML/cmm
+/b/it/10 D[]x[]\OT1/cmr/m/n/10 )[\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ])[] + \OML/
+cmm/b/it/10 b[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ]\OMS/cmsy/m/
+n/10 j\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ]\
+OMS/cmsy/m/n/10 j \OT1/cmr/m/n/10 + []([]\OML/cmm/b/it/10 R[]\OT1/cmr/m/n/10 [\
+OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ](\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OML/cm
+m/m/it/10 i\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10 ^^@ \OML/cmm/b/it/10 x[]\OT1/cmr/
+m/n/10 [\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ]) + [])[] = 0
+ []
+
+
+Overfull \hbox (14.57214pt too wide) detected at line 90
+\OMS/cmsy/m/n/10 r[][]\OT1/cmr/m/n/10 (\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OM
+L/cmm/m/it/10 i\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10 ^^@ \OT1/cmr/m/n/10 (\OML/cmm
+/b/it/10 D[]x[]\OT1/cmr/m/n/10 )[\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ])[] + \OML/
+cmm/b/it/10 b[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ]\OMS/cmsy/m/
+n/10 j\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ]\
+OMS/cmsy/m/n/10 j \OT1/cmr/m/n/10 + [](\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OM
+L/cmm/m/it/10 i\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10 ^^@ \OML/cmm/b/it/10 x[]\OT1/
+cmr/m/n/10 [\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ] + [])[] = 0
+ []
+
+
+Overfull \hbox (17.7098pt too wide) detected at line 100
+\OMS/cmsy/m/n/10 r[][]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 ^^V[] \OT1/cmr/m/n/10 +
+ \OML/cmm/m/it/10 ^^Z^^V[]\OML/cmm/b/it/10 R[]\OT1/cmr/m/n/10 )\OML/cmm/b/it/10
+ z[] \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 ^^V[]\OML/cmm/b/it/10 D[]x[]z[] \OMS
+/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 ^^Z^^V[]\OML/cmm/b/it/10 R[]x[]z[] \OT1/cmr/m
+/n/10 + []\OML/cmm/b/it/10 R[]^^M[]z[] \OT1/cmr/m/n/10 + \OML/cmm/b/it/10 b[]\O
+MS/cmsy/m/n/10 j\OML/cmm/b/it/10 z[]\OMS/cmsy/m/n/10 j \OT1/cmr/m/n/10 = 0
+ []
+
+
+Overfull \hbox (0.21307pt too wide) detected at line 104
+\OMS/cmsy/m/n/10 r[][]\OML/cmm/b/it/10 z[] \OMS/cmsy/m/n/10 ^^@ []\OML/cmm/b/it
+/10 z[] \OT1/cmr/m/n/10 + []\OMS/cmsy/m/n/10 j\OML/cmm/b/it/10 z[]\OMS/cmsy/m/n
+/10 j \OT1/cmr/m/n/10 = 0
+ []
+
+
+Overfull \hbox (0.66025pt too wide) detected at line 112
+\OML/cmm/b/it/10 z[] \OT1/cmr/m/n/10 = [] [][](\OML/cmm/m/it/10 ^^V[]\OT1/cmr/m
+/n/10 (\OML/cmm/b/it/10 D[]R[]R[]x[]\OT1/cmr/m/n/10 ) + \OML/cmm/m/it/10 ^^Z^^V
+[]\OML/cmm/b/it/10 R[]\OT1/cmr/m/n/10 (\OML/cmm/b/it/10 R[]x[] \OMS/cmsy/m/n/10
+ ^^@ []\OT1/cmr/m/n/10 ))
+ []
+
+[2]
+Overfull \hbox (31.76723pt too wide) detected at line 118
+\OML/cmm/b/it/10 z[] \OT1/cmr/m/n/10 = [] [](\OML/cmm/m/it/10 ^^V[]\OT1/cmr/m/n
+/10 (\OML/cmm/b/it/10 D[]R[]R[]x[]\OT1/cmr/m/n/10 ) + \OML/cmm/m/it/10 ^^Z^^V[]
+\OML/cmm/b/it/10 R[]\OT1/cmr/m/n/10 (\OML/cmm/b/it/10 R[]x[] \OMS/cmsy/m/n/10 ^
+^@ []\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^@ \OML/cmm/b/it/10 b[]\OT1/cmr/m/n/10
+ )
+ []
+
+
+Overfull \hbox (13.97276pt too wide) detected at line 123
+\OMS/cmsy/m/n/10 r[][]\OT1/cmr/m/n/10 (\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OM
+L/cmm/m/it/10 i\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10 ^^@ \OT1/cmr/m/n/10 (\OML/cmm
+/b/it/10 D[]x[]\OT1/cmr/m/n/10 )[\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ])[] + \OML/
+cmm/b/it/10 b[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ]\OMS/cmsy/m/
+n/10 j\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 i\OT1/cmr/m/n/10 ]\
+OMS/cmsy/m/n/10 j \OT1/cmr/m/n/10 + [](\OML/cmm/b/it/10 A[]\OT1/cmr/m/n/10 [\OM
+L/cmm/m/it/10 i\OT1/cmr/m/n/10 ]\OML/cmm/b/it/10 x[]\OT1/cmr/m/n/10 [\OML/cmm/m
+/it/10 i\OT1/cmr/m/n/10 ] + \OML/cmm/b/it/10 B[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/
+10 i\OT1/cmr/m/n/10 ]\OML/cmm/b/it/10 z[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 i\OT
+1/cmr/m/n/10 ] + [])[] = 0
+ []
+
+
+Overfull \hbox (21.37158pt too wide) detected at line 141
+\OMS/cmsy/m/n/10 r[][]\OT1/cmr/m/n/10 (\OML/cmm/b/it/10 z \OMS/cmsy/m/n/10 ^^@ 
+[]\OT1/cmr/m/n/10 )[] + []\OMS/cmsy/m/n/10 j\OML/cmm/b/it/10 z[]\OMS/cmsy/m/n/1
+0 j \OT1/cmr/m/n/10 = 0
+ []
+
+[3]
+Overfull \hbox (77.74297pt too wide) detected at line 159
+\OML/cmm/b/it/10 z[] \OT1/cmr/m/n/10 = [] [][](\OML/cmm/m/it/10 ^^V[]\OML/cmm/b
+/it/10 D[]x[] \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 ^^Z^^V[]\OML/cmm/b/it/10 R[
+]\OT1/cmr/m/n/10 ((1 \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 []\OT1/cmr/m/n/10 )
+\OML/cmm/b/it/10 R[]z[] \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 []\OML/cmm/b/it/
+10 R[]x[] \OT1/cmr/m/n/10 + []))
+ []
+
+
+Overfull \hbox (108.84995pt too wide) detected at line 169
+\OML/cmm/b/it/10 z[] \OT1/cmr/m/n/10 = [] [](\OML/cmm/m/it/10 ^^V[]\OML/cmm/b/i
+t/10 D[]x[] \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 ^^Z^^V[]\OML/cmm/b/it/10 R[]\
+OT1/cmr/m/n/10 ((1 \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 []\OT1/cmr/m/n/10 )\O
+ML/cmm/b/it/10 R[]z[] \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 []\OML/cmm/b/it/10
+ R[]x[] \OT1/cmr/m/n/10 + []) \OMS/cmsy/m/n/10 ^^@ \OML/cmm/b/it/10 b[]\OT1/cmr
+/m/n/10 )
+ []
+
+[4]
+Overfull \hbox (7.2789pt too wide) detected at line 256
+\OML/cmm/b/it/10 z[] \OT1/cmr/m/n/10 = (\OML/cmm/m/it/10 ^^V[]\OT1/cmr/bx/n/10 
+I \OT1/cmr/m/n/10 + \OML/cmm/m/it/10 ^^Z\OML/cmm/b/it/10 W[]W\OT1/cmr/m/n/10 )[
+](\OML/cmm/m/it/10 ^^V[]\OML/cmm/b/it/10 D[]x[] \OT1/cmr/m/n/10 + \OML/cmm/m/it
+/10 ^^Z\OML/cmm/b/it/10 W[]\OT1/cmr/m/n/10 ((2 \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/
+it/10 []\OT1/cmr/m/n/10 )\OML/cmm/b/it/10 s \OMS/cmsy/m/n/10 ^^@ \OT1/cmr/m/n/
+10 (1 \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 []\OT1/cmr/m/n/10 )\OML/cmm/b/it/1
+0 Wz[] \OMS/cmsy/m/n/10 ^^@ []\OT1/cmr/m/n/10 ))
+ []
+
+[5]
+Overfull \hbox (70.98717pt too wide) detected at line 272
+\OML/cmm/b/it/10 z[] \OT1/cmr/m/n/10 = ([](\OT1/cmr/bx/n/10 I \OMS/cmsy/m/n/10 
+^^@ \OML/cmm/b/it/10 W[]W\OT1/cmr/m/n/10 ) + []\OML/cmm/b/it/10 W[]W\OT1/cmr/m/
+n/10 )(\OML/cmm/m/it/10 ^^V[]\OML/cmm/b/it/10 D[]x[] \OT1/cmr/m/n/10 + \OML/cmm
+/m/it/10 ^^Z\OML/cmm/b/it/10 W[]\OT1/cmr/m/n/10 ((2 \OMS/cmsy/m/n/10 ^^@ \OML/c
+mm/m/it/10 []\OT1/cmr/m/n/10 )\OML/cmm/b/it/10 s \OMS/cmsy/m/n/10 ^^@ \OT1/cmr
+/m/n/10 (1 \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 []\OT1/cmr/m/n/10 )\OML/cmm/b
+/it/10 Wz[] \OMS/cmsy/m/n/10 ^^@ []\OT1/cmr/m/n/10 ))
+ []
+
+
+Overfull \hbox (42.20363pt too wide) detected at line 276
+\OML/cmm/b/it/10 z[] \OT1/cmr/m/n/10 = ((\OT1/cmr/bx/n/10 I \OMS/cmsy/m/n/10 ^^
+@ \OML/cmm/b/it/10 W[]W\OT1/cmr/m/n/10 ) + []\OML/cmm/b/it/10 W[]W\OT1/cmr/m/n/
+10 )\OML/cmm/b/it/10 D[]x[] \OT1/cmr/m/n/10 + []((2 \OMS/cmsy/m/n/10 ^^@ \OML/c
+mm/m/it/10 []\OT1/cmr/m/n/10 )\OML/cmm/b/it/10 s \OMS/cmsy/m/n/10 ^^@ \OT1/cmr
+/m/n/10 (1 \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 []\OT1/cmr/m/n/10 )\OML/cmm/b
+/it/10 Wz[] \OMS/cmsy/m/n/10 ^^@ []
+ []
+
+[6] [7] (./multilayerADMMUpdateEq.aux) ) 
+Here is how much of TeX's memory you used:
+ 1110 strings out of 493029
+ 11542 string characters out of 6136233
+ 73261 words of memory out of 5000000
+ 4678 multiletter control sequences out of 15000+600000
+ 15087 words of font info for 53 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 27i,9n,22p,382b,200s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mmi12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.p
+fb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texl
+ive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib5.pfb></usr/share/texli
+ve/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib7.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmsy7.pfb>
+Output written on multilayerADMMUpdateEq.pdf (7 pages, 180720 bytes).
+PDF statistics:
+ 100 PDF objects out of 1000 (max. 8388607)
+ 72 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

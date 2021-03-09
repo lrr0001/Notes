@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+Problem:
+
+Let $\mZ \in \mathcal{R}^{m,n}, m < n$.
+
+Known: $\mL_k$, $\mLambda_k$ satisfying
+
+\begin{equation}
+\mId + \mZ\mZ^T = \mL_k\mLambda_k\mL_k^T
+\end{equation}
+
+Let $\vu \in \mathcal{R}^m$, and $\vv \in \mathcal{R}^n$.
+
+Desired: $\mL_{k + 1}$, $\mLambda_{k + 1}$ satisfying
+
+\begin{equation}
+\mId + (\mZ + \vu\vv^T)(\mZ + \vu\vv^T)^T = \mL_{k + 1}\mLambda_{k + 1}\mL_{k + 1}^T
+\end{equation}
+
+
+So, how do we get there?
+
+First, expand the LHS.
+
+\begin{equation}
+\mId + (\mZ + \vu\vv^T)(\mZ + \vu\vv^T)^T = \mId + \mZ\mZ^T + \mZ\vv\vu^T + \vu\vv^T\mZ + \vu\vv^T\vv\vu^T
+\end{equation}
+
+\begin{equation}
+\mId + \mZ\mZ^T + \mZ\vv\vu^T + \vu\vv^T\mZ + \vu\vv^T\vv\vu^T = \mL_{k + 1}\mLambda_{k + 1}\mL_{k + 1}^T
+\end{equation}
+
+Use $\mL_k^{-1}$ and $(\mL_k^T)^{-1}$ to get a $\mLambda_k$ term on the LHS.
+
+\begin{equation}
+\mL_k^{-1}(\mId + \mZ\mZ^T)(\mL_k^T)^{-1} + \mL_k^{-1}(\mZ\vv\vu^T + \vu\vv^T\mZ + \vu\vv^T\vv\vu^T)(\mL_k^T)^{-1} = \mL_{k}^{-1}\mL_{k + 1}\mLambda_{k + 1}\mL_{k + 1}^T(\mL_k^T)^{-1}
+\end{equation}
+
+\begin{equation}
+\mLambda_k + \mL_k^{-1}\mZ\vv(\mL_k^{-1}\vu)^T + \mL_k^{-1}\vu(\mL_k^{-1}\mZ\vv)^T + \vv^T\vv\mL_k^{-1}\vu(\mL_k^{-1}\vu)^T = \mL_{k}^{-1}\mL_{k + 1}\mLambda_{k + 1}\mL_{k + 1}^T(\mL_k^T)^{-1}
+\end{equation}
+
+Compute LDLT factorization on LHS. Then, solve for the new factorization.
+
+Rank-one, symmetric updates can be handled efficiently.  (See the Wikipedia page on Cholesky factorization.)  However, two of these updates are not symmetic. i attempted to modify the algorithm for symmetric, rank-one updates to handle the rank-2 case, but to no avail. However, I can take a rank-two symmetric update and convert it to two rank-one symmetric updates.
+
+\end{document}

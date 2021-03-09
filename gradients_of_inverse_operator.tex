@@ -1,0 +1,232 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+
+\section{Standard Form}
+
+
+I need to compute gradients, exploiting my Cholesky factorization for efficiency.
+
+\begin{equation}
+\vy = (\rho\mId + \mD^H\mD)^{-1}\vx
+\end{equation}
+
+As an abreviation:
+
+\begin{equation}
+\mA = \rho\mId + \mD^H\mD
+\end{equation}
+
+\begin{equation}
+\vy = \mA^{-1}\vx
+\end{equation}
+
+I need the derivative of the output $\vy$ in respect to dictionary weights $\mD$.
+
+Using the matrix cookbook, I get the following:
+
+\begin{equation}
+\frac{\partial \vy}{\partial D_{i,j}} = -\mA^{-1} \frac{\partial \mA}{\partial D_{i,j}} \mA^{-1}\vx
+\end{equation}
+
+The derivation is boring and tedious, but I computed the derivatives of $\mA$ and verified it by comparing to an empirical derivative in MATLAB.
+\begin{equation}
+\frac{\partial \mA}{\partial \operatorname{real}(D_{i,j})} = \ve_j\ve_i^T\mD + \mD^H\ve_i\ve_j^T
+\end{equation}
+
+\begin{equation}
+\frac{\partial \mA}{\partial \operatorname{imag}(D_{i,j})} = -1j*\ve_j\ve_i^T\mD + 1j*\mD^H\ve_i\ve_j^T
+\end{equation}
+
+It is necessary to compute separate partial derivatives for the real and imaginary components because approach direction in the complex plane matters for this function.
+
+Putting it all together, I have the following:
+
+\begin{equation}
+\frac{\partial\mA^{-1}\vx}{\partial \operatorname{real}(D_{i,j})} = -\mA^{-1}(\ve_j\ve_i^T\mD + \mD^H\ve_i\ve_j^T)\mA^{-1}\vx
+\end{equation}
+
+\begin{equation}
+\frac{\partial\mA^{-1}\vx}{\partial \operatorname{imag}(D_{i,j})} = -\mA^{-1}(-1j*\ve_j\ve_i^T\mD + 1j*\mD^H\ve_i\ve_j^T)\mA^{-1}\vx
+\end{equation}
+
+To use within the automatic differentiation framework in TensorFlow with loss $L$, I need to be able to compute $\frac{\partial L}{\partial \operatorname{real}(D_{i,j})}$ and $\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})}$ as a function of $\nabla_{\vy} L$, where $\nabla_{\vy} L$ is a column vector with $(\nabla_{\vy} L)[i] = \frac{\partial L}{\partial \operatorname{real}(\vy_i)} + j\frac{\partial L}{\partial \operatorname{imag}(\vy_i)}$.
+
+Given these notations, for generic composite function $f(g(\vx))$ with real output, the following equations can be derived using chain rule:
+\begin{equation}
+\frac{\partial f}{\partial \operatorname{real}(\vx)} = \operatorname{real}((\nabla_{g(\vx)} f)^H \frac{\partial g}{\partial \operatorname{real}(\vx)})
+\end{equation}
+\begin{equation}
+\frac{\partial f}{\partial \operatorname{imag}(\vx)} = \operatorname{real}((\nabla_{g(\vx)} f)^H \frac{\partial g}{\partial \operatorname{imag}(\vx)})
+\end{equation}
+
+Applying this general rule to the actual problem at hand:
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{real}(D_{i,j})} = \operatorname{real}((\nabla_{\vy} L)^H\frac{\partial \vy}{\partial \operatorname{real}(D_{i,j})})
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{real}(D_{i,j})} = -\operatorname{real}((\nabla_{\vy} L)^H\mA^{-1}(\ve_j\ve_i^T\mD + \mD^H\ve_i\ve_j^T)\mA^{-1}\vx)
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{real}(D_{i,j})} = -\operatorname{real}(((\nabla_{\vy} L)^H\mA^{-1}\ve_j)(\ve_i^T\mD\mA^{-1}\vx)) - \operatorname{real}(((\nabla_{\vy} L)^H\mA^{-1}\mD^H\ve_i)(\ve_j^T\mA^{-1}\vx))
+\end{equation}
+
+Returning for the partial derivative in respect to the imaginary component I have:
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = \operatorname{real}((\nabla_{\vy} L)^H\frac{\partial \vy}{\partial \operatorname{imag}(D_{i,j})})
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = -\operatorname{real}((\nabla_{\vy} L)^H\mA^{-1}(-1j*\ve_j\ve_i^T\mD + 1j*\mD^H\ve_i\ve_j^T)\mA^{-1}\vx)
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = -\operatorname{real}(-1j*((\nabla_{\vy} L)^H\mA^{-1}\ve_j)(\ve_i^T\mD\mA^{-1}\vx)) - \operatorname{real}(1j*((\nabla_{\vy} L)^H\mA^{-1}\mD^H\ve_i)(\ve_j^T\mA^{-1}\vx))
+\end{equation}
+
+I would like to combine this with the partial derivative in respect to the real component.
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = -\operatorname{real}(-1j*((\nabla_{\vy} L)^H\mA^{-1}\ve_j)(\ve_i^T\mD\mA^{-1}\vx)) - \operatorname{real}(-1j*(-(\nabla_{\vy} L)^H\mA^{-1}\mD^H\ve_i)(\ve_j^T\mA^{-1}\vx))
+\end{equation}
+
+Using the fact that $\operatorname{real}(-1j*\vx) = \operatorname{imag}(\vx)$:
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = -\operatorname{imag}(((\nabla_{\vy} L)^H\mA^{-1}\ve_j)(\ve_i^T\mD\mA^{-1}\vx)) - \operatorname{imag}(-((\nabla_{\vy} L)^H\mA^{-1}\mD^H\ve_i)(\ve_j^T\mA^{-1}\vx))
+\end{equation}
+
+In a slight abuse of notation, I define $\frac{\partial f}{\partial x} = \frac{\partial f}{\partial \operatorname{real}(x)} + j\frac{\partial f}{\partial \operatorname{imag}(x)}$
+
+So,
+
+\begin{equation}
+\frac{\partial L}{\partial D_{i,j}} = -((\nabla_{\vy} L)^H\mA^{-1}\ve_j)(\ve_i^T\mD\mA^{-1}\vx) - ((\nabla_{\vy} L)^H\mA^{-1}\mD^H\ve_i)^*(\ve_j^T\mA^{-1}\vx)^*
+\end{equation}
+
+Since we're looking at scalars, conjugates can be replaced with a Hermitian transpose. ($\mA^{-1}$ is Hermitian, so it's Hermitian transpose is itself.)
+
+\begin{equation}
+\frac{\partial L}{\partial D_{i,j}} = -(\ve_i^T\mD\mA^{-1}\vx)((\nabla_{\vy} L)^H\mA^{-1}\ve_j) - (\ve_i^T\mD\mA^{-1}\nabla_{\vy} L)(\vx^H\mA^{-1}\ve_j)
+\end{equation}
+
+Note in each term is the product of the $i$th element of a column vector and the $j$th element of a row vector. Therefore, I can compile the entire gradient in respect to matrix $\mD$ by summing the outer products:
+
+\begin{equation}
+\nabla_{\mD} L = -(\mD\mA^{-1}\vx)(\mA^{-1}\nabla_{\vy} L)^H - (\mD\mA^{-1}\nabla_{\vy} L)(\mA^{-1}\vx)^H
+\end{equation}
+
+
+\section{Woodbury Form}
+
+I need to compute gradients, exploiting my Cholesky factorization for efficiency.
+
+\begin{equation}
+\vy = (\rho\mId + \mD\mD^H)^{-1}\vx
+\end{equation}
+
+As an abreviation:
+
+\begin{equation}
+\mA = \rho\mId + \mD\mD^H
+\end{equation}
+
+\begin{equation}
+\vy = \mA^{-1}\vx
+\end{equation}
+
+I need the derivative of the output $\vy$ in respect to dictionary weights $\mD$.
+
+Using the matrix cookbook, I get the following:
+
+\begin{equation}
+\frac{\partial \vy}{\partial D_{i,j}} = -\mA^{-1} \frac{\partial \mA}{\partial D_{i,j}} \mA^{-1}\vx
+\end{equation}
+
+The derivation is boring and tedious, but I computed the derivative of $\mA$ and verified it using empirical tests in MATLAB.
+\begin{equation}
+\frac{\partial \mA}{\partial \operatorname{real}(D_{i,j})} = \ve_i\ve_j^T\mD^H + \mD\ve_j\ve_i^T
+\end{equation}
+
+\begin{equation}
+\frac{\partial \mA}{\partial \operatorname{imag}(D_{i,j})} = 1j*\ve_i\ve_j^T\mD^H - 1j*\mD\ve_j\ve_i^T
+\end{equation}
+
+Putting it all together, I have the following:
+
+\begin{equation}
+\frac{\partial\mA^{-1}\vx}{\partial \operatorname{real}(D_{i,j})} = -\mA^{-1}(\ve_i\ve_j^T\mD^H + \mD\ve_j\ve_i^T)\mA^{-1}\vx
+\end{equation}
+
+\begin{equation}
+\frac{\partial\mA^{-1}\vx}{\partial \operatorname{imag}(D_{i,j})} = -\mA^{-1}(1j*\ve_i\ve_j^T\mD^H - 1j*\mD\ve_j\ve_i^T)\mA^{-1}\vx
+\end{equation}
+
+To use within the automatic differentiation framework in TensorFlow with loss $L$, I need to be able to compute $\frac{\partial L}{\partial \operatorname{real}(D_{i,j})}$ and $\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})}$ as a function of $\nabla_{\vy} L$, where $\nabla_{\vy} L$ is a column vector with $(\nabla_{\vy} L)[i] = \frac{\partial L}{\partial \operatorname{real}(\vy_i)} + j\frac{\partial L}{\partial \operatorname{imag}(\vy_i)}$.
+
+Given these notations, for generic composite function $f(g(\vx))$ with real output, the following equations can be derived using chain rule:
+\begin{equation}
+\frac{\partial f}{\partial \operatorname{real}(\vx)} = \operatorname{real}((\nabla_{g(\vx)} f)^H \frac{\partial g}{\partial \operatorname{real}(\vx)})
+\end{equation}
+\begin{equation}
+\frac{\partial f}{\partial \operatorname{imag}(\vx)} = \operatorname{real}((\nabla_{g(\vx)} f)^H \frac{\partial g}{\partial \operatorname{imag}(\vx)})
+\end{equation}
+
+Applying this general rule to the actual problem at hand:
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{real}(D_{i,j})} = \operatorname{real}((\nabla_{\vy} L)^H\frac{\partial \vy}{\partial \operatorname{real}(D_{i,j})})
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{real}(D_{i,j})} = -\operatorname{real}((\nabla_{\vy} L)^H\mA^{-1}(\ve_i\ve_j^T\mD^H + \mD\ve_j\ve_i^T)\mA^{-1}\vx)
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{real}(D_{i,j})} = -\operatorname{real}(((\nabla_{\vy} L)^H\mA^{-1}\ve_i)(\ve_j^T\mD^H\mA^{-1}\vx)) - \operatorname{real}(((\nabla_{\vy} L)^H\mA^{-1}\mD\ve_j)(\ve_i^T\mA^{-1}\vx))
+\end{equation}
+
+Returning for the partial derivative in respect to the imaginary component
+I have:
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = \operatorname{real}(\nabla_{\vy} L)^H\frac{\partial \vy}{\partial \operatorname{imag}(D_{i,j})})
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = -\operatorname{real}((\nabla_{\vy} L)^H\mA^{-1}(1j*\ve_i\ve_j^T\mD^H - 1j*\mD\ve_j\ve_i^T)\mA^{-1}\vx)
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = -\operatorname{real}(1j*((\nabla_{\vy} L)^H\mA^{-1}\ve_i)(\ve_j^T\mD^H\mA^{-1}\vx)) - \operatorname{real}(-1j*((\nabla_{\vy} L)^H\mA^{-1}\mD\ve_j)(\ve_i^T\mA^{-1}\vx))
+\end{equation}
+
+I would like to combine this expression with the partial derivative in respect to the real component.
+
+\begin{equation}
+\frac{\partial L}{\partial \operatorname{imag}(D_{i,j})} = -\operatorname{imag}(-1*((\nabla_{\vy} L)^H\mA^{-1}\ve_i)(\ve_j^T\mD^H\mA^{-1}\vx)) - \operatorname{imag}(((\nabla_{\vy} L)^H\mA^{-1}\mD\ve_j)(\ve_i^T\mA^{-1}\vx))
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial D_{i,j}} = -((\nabla_{\vy} L)^H\mA^{-1}\ve_i)^*(\ve_j^T\mD^H\mA^{-1}\vx)^* - (\frac{\partial L}{\partial \vy}\mA^{-1}\mD\ve_j)(\ve_i^T\mA^{-1}\vx)
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial D_{i,j}} = -(\ve_i^T\mA^{-1}\nabla_{\vy} L)(\vx^H\mA^{-1}\mD\ve_j) - (\ve_i^T\mA^{-1}\vx)((\nabla_{\vy} L)^H\mA^{-1}\mD\ve_j)
+\end{equation}
+
+
+\begin{equation}
+\nabla_{\mD} L = -(\mA^{-1}\nabla_{\vy} L)(\mD^H\mA^{-1}\vx)^H - (\mA^{-1}\vx)(\mD^H\mA^{-1}\nabla_{\vy} L)^H
+\end{equation}
+
+\end{document}

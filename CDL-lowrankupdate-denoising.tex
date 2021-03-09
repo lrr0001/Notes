@@ -1,0 +1,89 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+Consider the optimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx,\vy,\vz} & \|\mW\vy\|_1 + \lambda\|\valpha \cdot \vz\|_1 + \frac{\mu}{2}\|\mGamma_0\mR^{-1}\vx\|_2^2 + \frac{\mu}{2} \|\mGamma_1\mR^{-1}\vx\|_2^2 \\
+& \text{subject to } & \mR^{-1}(\vz - \vx) = 0 \\
+  &                  & \mD\vx + \vy = \vs
+\end{aligned}
+\end{equation}
+
+First, let's compute the augmented Lagrangian.
+
+\begin{equation}
+\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \|\mW\vy\|_1 + \lambda\|\valpha \cdot \vz\|_1 + \frac{\mu}{2}\|\mGamma_0\mR^{-1}\vx\|_2^2 + \frac{\mu}{2} \|\mGamma_1\mR^{-1}\vx\|_2^2 + \frac{\rho}{2}\|\mR^{-1}(\vz - \vx) + \frac{\vgamma}{\rho}\|_2^2 + \frac{\rho}{2}\|\mD\vx + \vy - \vs + \frac{\veta}{\rho}\|_2^2
+\end{equation}
+
+\begin{equation}
+\frac{\partial}{\partial \vx} \operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \mu\mR^{-1}(\mGamma_0^H\mGamma_0 + \mGamma_1^H\mGamma_1)\mR^{-1}\vx + \rho\mR^{-2}(\vx - \vz) - \vgamma + \rho(\mD^H\mD\vx + \mD^H(\vy - \vs + \frac{\veta}{\rho}))
+\end{equation}
+
+Setting the partial derivative equal to zero:
+
+\begin{equation}
+(\rho\mR^{-2} + \rho\mD^H\mD + \mu\mR^{-1}\mGamma_0^H\mGamma_0\mR^{-1} + \mu\mR^{-1}\mGamma_1^H\mGamma_1\mR^{-1})\vx = \rho\mR^{-2}\vz + \mR^{-1}\vgamma -\rho\mD^H(\vy - \vs + \frac{\veta}{\rho})
+\end{equation}
+
+\begin{equation}
+\mR^{-1}(\rho\mId + \rho(\mD\mR)^H\mD\mR + \mu\mGamma_0^H\mGamma_0 + \mu\mGamma_1^H\mGamma_1)\mR^{-1}\vx = \rho\mR^{-2}\vz + \mR^{-1}\vgamma -\rho\mD^H(\vy - \vs + \frac{\veta}{\rho})
+\end{equation}
+
+\begin{equation}
+(\mId + (\mD\mR)^H\mD\mR + \frac{\mu}{\rho}\mGamma_0^H\mGamma_0 + \frac{\mu}{\rho}\mGamma_1^H\mGamma_1)\mR^{-1}\vx = \mR^{-1}\vz + \frac{\vgamma}{\rho} - (\mD\mR)^H(\vy - \vs + \frac{\veta}{\rho})
+\end{equation}
+
+\begin{equation}
+\mR^{-1}\vx = (\mId + (\mD\mR)^H\mD\mR + \frac{\mu}{\rho}\mGamma_0^H\mGamma_0 + \frac{\mu}{\rho}\mGamma_1^H\mGamma_1)^{-1}(\mR^{-1}\vz + \frac{\vgamma}{\rho} - (\mD\mR)^H(\vy - \vs + \frac{\veta}{\rho})
+\end{equation}
+
+Looking at the terms of the augmented Lagrangian that depend on $\vy$:
+
+\begin{equation}
+\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \|\mW\vy\|_1 + \frac{\rho}{2}\|\mD\vx + \vy - \vs + \frac{\veta}{\rho}\|_2^2 + f_{\rho,\mu}(\vx,\vz,\vgamma)
+\end{equation}
+
+Minimizing the augmented Lagrangian in respect to $\vy$
+
+\begin{equation}
+\vy = \operatorname{S}_{\frac{\mW}{\rho}}(\vs - \mD\vx - \frac{\veta}{\rho})
+\end{equation}
+
+Looking at the terms of the augmented Lagrangian that depend on $\vz$:
+\begin{equation}
+\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \lambda\|\valpha \cdot \vz\|_1 + \frac{\rho}{2}\|\mR^{-1}(\vz - \vx) + \frac{\vgamma}{\rho}\|_2^2 + g_{\rho,\mu,\mW}(\vx,\vy,\veta)
+\end{equation}
+
+Minimizing the augmented Lagrangian in respect to $\vz$
+
+\begin{equation}
+\mR^{-1}\vz = \operatorname{S}_{\frac{\lambda\valpha\mR}{\rho}}(\mR^{-1}\vx - \frac{\vgamma}{\rho})
+\end{equation}
+
+The dual variable updates are unchanged from other formulations, so I will omit them in this document.
+
+
+To summarize:
+
+\begin{equation}
+\mR^{-1}\vx = (\mId + (\mD\mR)^H\mD\mR + \frac{\mu}{\rho}\mGamma_0^H\mGamma_0 + \frac{\mu}{\rho}\mGamma_1^H\mGamma_1)^{-1}(\mR^{-1}\vz + \frac{\vgamma}{\rho} - (\mD\mR)^H(\vy - \vs + \frac{\veta}{\rho})
+\end{equation}
+
+\begin{equation}
+\vy = \operatorname{S}_{\frac{1}{\rho}}(\vs - \mD\vx - \frac{\veta}{\rho})
+\end{equation}
+
+\begin{equation}
+\mR^{-1}\vz = \operatorname{S}_{\frac{\lambda\valpha\mR}{\rho}}(\mR^{-1}\vx - \frac{\vgamma}{\rho})
+\end{equation}
+
+
+
+\end{document}

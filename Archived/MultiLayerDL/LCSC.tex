@@ -1,0 +1,150 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\input{defs-LCSC}
+\begin{document}
+
+\begin{equation}
+\begin{aligned}
+& \underset{\bvalpha,\bvz,\vy}{\text{minimize}}
+&& \|\vx - \mtx{M}\vy\|_2^2 + \sum_{i = 1}^L \lambda_i \|\vz_i\|_1 \\
+& \text{subject to}
+&&  \mD_1\valpha_1 = \mPhi\vy \\
+&&& \mP_{\ell - 1}\valpha_{\ell - 1} = \mD_{\ell}\valpha_{\ell} & \forall \ell \in \{2,\hdots,L\}  \\
+&&& \valpha_{\ell} = \mPhi\vz_{\ell} & \forall \ell \in \{1,\hdots,L\}
+\end{aligned}
+\end{equation}
+where $\mPhi$ is the Fourier transform, $\{\mP_i\}_{i \in \{1,\hdots,L - 1\}}$ are pooling operations, and $\{\mD_i\}_{i \in \{1,\hdots,L\}}$ are the dictionaries in frequency domain.
+
+\begin{equation}
+\begin{aligned}
+& \underset{\bvalpha,\bmD}{\text{minimize}}
+&& \|\vx - \mtx{M}\mD_1\valpha_1\|_2^2 + \sum_{i = 1}^L \lambda_i \|\valpha_i\|_1 \\
+& \text{subject to}
+&& \mP_{\ell - 1}\valpha_{\ell - 1} = \mD_{\ell}\valpha_{\ell} & \forall \ell \in \{2,\hdots,L\}  \\
+&&& \mPhi^{-1}\vd_{\ell}[:,k_{\ell}] = \mS_i\mPhi^{-1}\vd_{\ell}[:,k_{\ell}] & \forall \ell \in \{1,\hdots,L\},k_{\ell} \in \{1,\hdots,K_{\ell}\} \\
+&&& \frac{1}{P_{\ell - 1}K_{\ell - 1}}\|\vd_{\ell}[:,k_{\ell}] \|_2 \leq 1 & \forall \ell \in \{1,\hdots,L\}k_{\ell - 1} \in \{1,\hdots,K_{\ell - 1}\}
+\end{aligned}
+\end{equation}
+where $\mS_i$ is a projection to the predined spatial support for $\vd_i$, $P_{\ell}$ is the size of each channel at layer $\ell$, $K_{\ell}$ is the number of channels at layer $\ell$ ($K_0$ is the number of input channels), and $L$ is the number of layers.
+
+\begin{equation}
+\begin{aligned}
+& \underset{\bvalpha,\bmD}{\text{minimize}}
+&& \sum_{t = 1}^T (\|\vx^t - \mtx{M}\mD_1\valpha_1^t\|_2^2 + \sum_{\ell = 1}^L \lambda_{\ell} \|\valpha_{\ell}^t\|_1) \\
+& \text{subject to}
+&& \mP_{\ell - 1}\valpha_{\ell - 1}^t = \mD_{\ell}\valpha_{\ell}^t   \\
+&&& \mPhi^{-1}\vd_{\ell}[:,k_{\ell}] = \mS_i\mPhi^{-1}\vd_{\ell}[:,\ell]  \\
+&&& \frac{1}{P_{\ell - 1}K_{\ell - 1}}\|\vd_{\ell}[:,\ell] \|_2 \leq 1
+\end{aligned}
+\end{equation}
+where $\mS_i$ is a projection to the predined spatial support for $\vd_i[:,k_{\ell}]$, $P_{\ell}$ is the size of each channel at layer $\ell$, $K_{\ell}$ is the number of channels at layer $\ell$ ($K_0$ is the number input channels), and $L$ is the number of layers.
+
+Nothing in this approach precludes us from using filters of different size within the same layer, filter size being controlled by support-projection matrix $\mS_i$.  I'm not sure how to word this. Each channel has an effective filter size. If we want to keep this property while introducing varying filter sizes within layers, we will need to adjust the support of the filters of the subsequent layer as well. The subfilters applied to each channel must be adjusted to account for the varying filter sizes from previous layer.
+
+That is, an element of $\vz_i$ has a region of support in $\vy$. If different channels have different regions of support, we need to correct for that when we linearly combine filtered channels.  Put another way, were we to remove all truncation of convolutions, we need to produce a linear combination of images that are all of the same size, without zero-padding.  I'll derive the math for this later. Feel like this should be a section of the paper, even if we don't implement (which we should, even if we don't fully test on real data).  Note, I describe the channel size "without zero padding", but for implementation purposes, zero-padding is the way to go here.  It's just that if a filter is $s$ pixels wider, than the subfilters applied to that channel should be $Ms$ pixels thinner in the dictionary for the previous layer.
+
+
+\begin{equation}
+\underset{\bvalpha}{\arg\min} \frac{\rho}{2}\sum_{t = 1}^T \|\mD_1\valpha_1^t - \mPhi\vy^t + \vmu_y^t\|_2^2 + \sum_{\ell = 1}^L \|\valpha_{\ell}^t - \mPhi\vz_{\ell}^t + \vmu_{\alpha_{\ell}}^t|_2^2 + \sum_{\ell = 2}^L \| \mP_{\ell - 1} \valpha_{\ell - 1}^t - \mD_{\ell}\valpha_{\ell}^t + \vmu_{D\alpha_{\ell}}^t\|_2^2
+\end{equation}
+
+\begin{equation}
+\frac{\partial \L(\bvalpha,\bvz,\vy,\bvmu)}{\partial \valpha_1^t} =
+\frac{\rho}{2}(\mD_1^{\H}\mD_1\valpha_1^t
++ \mD_1^{\H}(\vmu_y^t - \mPhi\vy^t) 
++ \valpha_1^t 
++ (\mu_{\alpha_1}^t - \mPhi \vz_1^t) 
++ \mP_{1}^{\H}\mP_1\valpha_1^t 
++ \mu_{D\alpha_2}^t 
+- \mD_2\valpha_2^t
+\end{equation}
+
+\begin{equation}
+\frac{\partial \L(\bvalpha,\bvz,\vy,\bvmu)}{\partial \valpha_1^t} = 0 \implies (\mId + \mP_1^{\H}\mP_1 + \mD_1^{\H}\mD_1)\valpha_1^t - \mP_1^{\H}\mD_2\valpha_2^t = \mD_1^{\H}(\mPhi\vy^t - \vmu_y^t) + \mPhi\vz_1^t - \vmu_{\alpha_1}^t - \mP_1^{\H}\vmu_{D\alpha_2}^t
+\end{equation}
+
+\begin{equation}
+\frac{\partial \L(\bvalpha,\bvz,\vy,\bvmu)}{\partial \valpha_i} = \frac{\rho}{2}(\valpha_i^t - \mPhi\vz_i^t + \vmu_{\alpha_i}^t + \mP_i^{\H}\mP_i\valpha_i^t - \mP_i^{\H}(\mD_{i + 1}\valpha_{i + 1}^t - \mu_{D\alpha_i}^t) + \mD_{i}^{\H}\mD_{i}\valpha_{i}^t - \mD_i^{\H}(\mP_{i - 1}\alpha_{i - 1}^t + \vmu_{D\alpha_{i - 1}}^t))
+\end{equation}
+
+\begin{equation}
+\frac{\partial \L(\bvalpha,\bvz,\vy,\bvmu)}{\partial \valpha_i^t} = 0 \implies
+-\mD_i^{\H}\mP_{i - 1}\valpha_{i - 1}
++ (\mId + \mP_i^{\H}\mP_i + \mD_i^{\H}\mD_i)\valpha_i
+- \mP_i^{\H}\mD_{i + 1}\valpha_{i + 1}^t
+=
+\mPhi\vz_i^t - \vmu_{\alpha_i}^t 
+- \mP_i\vmu_{D\alpha_i}^t 
++ \mD_i^{\H}\vmu_{D\alpha_{i - 1}}^t
+\end{equation}
+
+
+
+Convolutional Sparse Coding Pursuit:
+Sparse coding pursuit attempts to reconstruct an input signal from a linear combination of atoms. The atoms are selected from a given dictionary, and the coefficients are required to be sparse:
+
+%\begin{equation}
+\begin{align}
+& \minimize_{\alpha} && \|\vx - \mD\valpha\|_2^2\\
+&& \text{subject to} & \|\valpha\|_0 \leq \tau
+\end{align}
+%\end{equation}
+The problem as shown above is NP-hard to solve, but approximate methods have proven sufficient in many contexts.  For the purposes of this paper, we will be most interested in the convex relaxation of the above equation (an L-1 constraint is equivalent):
+%\begin{equation}
+\begin{align}
+& \minimize_{\alpha} && \|\vx - \mD\valpha\|_2^2 + \lambda \|\valpha\|_1
+\end{align}
+%\end{equation}
+
+In convolutional sparse coding pursuit, the dictionary atoms are convolved with the coefficients to reconstruct the signal.
+
+Ok, this transition isn't going to make sense here.
+
+
+For signal $\vs$ and $K$ dictionary atoms $d_1, \hdots,d_K$, we can formulate a convolutional sparse coding pursuit problem as
+
+\begin{equation}
+\minimize_{\valpha} \|\vx - \mM\sum_{i = 1}^K \vd_i * \valpha_i\|^2 + \lambda \sum_{i = 1}^K \|\valpha_i\|_1
+\end{equation}
+
+where $\mM$ is a projection matrix to remove boundary effects and $*$ denotes convolution.
+
+We can rewrite this as 
+\begin{equation}
+\mD = \begin{bmatrix}\mD_1 & \hdots & \mD_K \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\valpha = \begin{bmatrix} \valpha_1 \\ \vdots \\ \alpha_K \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\minimize_{\valpha} \|\vx - \mM\mD\valpha\|_2^2 + \lambda \|\valpha\|_1
+\end{equation}
+
+
+Reformulating this as an ADMM problem, we have
+
+%\begin{equation}
+\begin{align}
+\minimize_{\valpha,\vy,\vz} && \|\vx - \mM\vy\|_2^2 + \lambda \|\vz_i\|_1\\
+& \text{subject to} & \vy = \mD\valpha\\
+&&                    \valpha = \vz\\
+\end{align}
+%\end{equation}
+
+ADMM gives us three update equations:
+\begin{equation}
+\valpha^{(t + 1)} = (\mId + \mD^{\H}\mD)^{-1}(-\mD^{\H}(\vy^{(t)} + \mu_y^{(t)}) - \vz^{(t)} - \mu_z^{(t)}
+\end{equation}
+
+
+This will be another abrupt transition, but I need to get this down.
+
+It is necessary to store inverse matrices. Storing inverse matrices for pursuit requires $\bigO(\sum_{\ell = 1}^{L}K_{\ell}^2MN)$.
+
+Storing inverse matrices for updating dictionaries poses a larger challenge. If we learn the dictionary in frequency domain, this will leave us with memory requirements on the order of $\bigO(K_{\ell}^2K_{\ell - 1}^2MN)$. However, it is possible to learn the dictionary in the spatial domain. This changes the memory requirement per layer to $\bigO(K_{\ell}^2K_{\ell - 1}^2F_{\ell}^2)$ where $F_{\ell}$ is the size of the filter. Inconveniently, when using this memory trick, we lose the block-diagonal property we had in frequency domain. I tried unsuccessfully to diagonalize the smaller matrix, but I was unsuccessful. For now, it appears I'm stuck with quartic cost for storage and for multiplication.
+
+
+\end{document}

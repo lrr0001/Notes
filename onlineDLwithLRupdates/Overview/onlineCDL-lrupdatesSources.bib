@@ -1,0 +1,432 @@
+% Encoding: UTF-8
+
+@Article{zhang2019making,
+  author   = {Zhang, Richard},
+  journal  = {arXiv preprint arXiv:1904.11486},
+  title    = {Making convolutional networks shift-invariant again},
+  year     = {2019},
+  abstract = {Modern  convolutional  networks  are  not  shift-invariant,  as  small  input  shifts  or  translations can cause drastic changes in the output.  Commonly  used  downsampling  methods,  such  as max-pooling, strided-convolution, and average-pooling, ignore the sampling theorem. The well-known signal processing fix is anti-aliasing by low-pass filtering before downsampling.  However, simply inserting this module into deep net-works  degrades  performance;  as  a  result,  it  is seldomly used today.  We show that when integrated correctly, it is compatible with existing architectural components, such as max-pooling and strided-convolution.   We observe increased accuracy in ImageNet classification, across several commonly-used  architectures, such as ResNet, DenseNet, and MobileNet, indicating effective regularization.  Furthermore, we observe better generalization, in terms of stability and robustness to input corruptions. Our results demonstrate that this classical signal processing technique has been undeservingly overlooked in modern deep networks.},
+}
+
+@Article{azulay2018deep,
+  author   = {Azulay, Aharon and Weiss, Yair},
+  journal  = {arXiv preprint arXiv:1805.12177},
+  title    = {Why do deep convolutional networks generalize so poorly to small image transformations?},
+  year     = {2018},
+  abstract = {Convolutional Neural Networks (CNNs) are commonly assumed to be invariant to smallimage  transformations:  either  because  of  the  convolutional  architecture  or  because  theywere trained using data augmentation.  Recently, several authors have shown that this isnot  the  case:  small  translations  or  rescalings  of  the  input  image  can  drastically  changethe network’s prediction.  In this paper, we quantify this phenomena and ask why neither the convolutional architecture nor data augmentation are sufficient to achieve the desired invariance.  Specifically, we show that the convolutional architecture does not give invariance  since  architectures  ignore  the  classical  sampling  theorem,  and  data  augmentation does not give invariance because the CNNs learn to be invariant to transformations only for images that are very similar to typical images from the training set.  We discuss two possible solutions to this problem:
+(1) antialiasing the intermediate representations and
+(2) increasing data augmentation
+and show that they provide only a partial solution at best. Taken together, our results indicate that the problem of insuring invariance to small image transformations in neural networks while preserving high accuracy remains unsolved.},
+  keywords = {Machine Learning, Deep Convolutional Neural Networks, Generalization, Aliasing, Sampling, Pooling},
+}
+
+@InProceedings{yosinski2014transferable,
+  author    = {Yosinski, Jason and Clune, Jeff and Bengio, Yoshua and Lipson, Hod},
+  booktitle = {Advances in neural information processing systems},
+  title     = {How transferable are features in deep neural networks?},
+  year      = {2014},
+  pages     = {3320--3328},
+}
+
+@Article{sulam2019multi,
+  author    = {Sulam, Jeremias and Aberdam, Aviad and Beck, Amir and Elad, Michael},
+  journal   = {IEEE transactions on pattern analysis and machine intelligence},
+  title     = {On multi-layer basis pursuit, efficient algorithms and convolutional neural networks},
+  year      = {2019},
+  publisher = {IEEE},
+}
+
+@Article{wohlberg2015efficient,
+  author    = {Wohlberg, Brendt},
+  journal   = {IEEE Transactions on Image Processing},
+  title     = {Efficient algorithms for convolutional sparse representations},
+  year      = {2015},
+  number    = {1},
+  pages     = {301--315},
+  volume    = {25},
+  publisher = {IEEE},
+}
+
+@InProceedings{bristow2013fast,
+  author    = {Bristow, Hilton and Eriksson, Anders and Lucey, Simon},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  title     = {Fast convolutional sparse coding},
+  year      = {2013},
+  pages     = {391--398},
+}
+
+@Article{vsorel2016fast,
+  author    = {{\v{S}}orel, Michal and {\v{S}}roubek, Filip},
+  journal   = {Digital Signal Processing},
+  title     = {Fast convolutional sparse coding using matrix inversion lemma},
+  year      = {2016},
+  pages     = {44--51},
+  volume    = {55},
+  publisher = {Elsevier},
+}
+
+@InProceedings{heide2015fast,
+  author    = {Heide, Felix and Heidrich, Wolfgang and Wetzstein, Gordon},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  title     = {Fast and flexible convolutional sparse coding},
+  year      = {2015},
+  pages     = {5135--5143},
+}
+
+@Article{wang2018scalable,
+  author    = {Wang, Yaqing and Yao, Quanming and Kwok, James T and Ni, Lionel M},
+  journal   = {IEEE Transactions on Image Processing},
+  title     = {Scalable online convolutional sparse coding},
+  year      = {2018},
+  number    = {10},
+  pages     = {4850--4859},
+  volume    = {27},
+  publisher = {IEEE},
+}
+
+@InProceedings{8461884,
+  author    = {J. {Quesada} and P. {Rodriguez} and B. {Wohlberg}},
+  booktitle = {2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  title     = {Separable Dictionary Learning for Convolutional Sparse Coding via Split Updates},
+  year      = {2018},
+  month     = {April},
+  pages     = {4094-4098},
+  abstract  = {Existing methods for constructing separable 2D dictionary filter banks approximate a set of K non-separable filters via a linear combination of R ≪ K separable filters. This approach involves the inefficiency of learning an initial set of non-separable filters, and places an upper bound on the quality of the separable filter banks. In this paper, we propose a method to directly learn a set of K separable dictionary filters from a given image training set by drawing ideas from convolutional dictionary learning (CDL) methods. We show that the separable filters obtained by our method match the performance of an equivalent number of non-separable filters. Furthermore, the computational performance of our learning method is shown to be substantially faster than a state-of-the-art non-separable CDL method for large numbers of filters or large training sets.},
+  doi       = {10.1109/ICASSP.2018.8461884},
+  keywords  = {channel bank filters;convolutional codes;image coding;image filtering;separable 2D dictionary filter banks;nonseparable CDL method;image training set;convolutional dictionary learning methods;K separable dictionary filters;K nonseparable filters;convolutional sparse coding;separable dictionary learning;Convolutional codes;Machine learning;Dictionaries;Training;Standards;Convolution;Task analysis;Convolutional Sparse Representation;Dictionary Learning;Separable filters},
+}
+
+@InProceedings{garcia2018multichannel,
+  author    = {C. {Garcia-Cardona} and B. {Wohlberg}},
+  booktitle = {2018 52nd Asilomar Conference on Signals, Systems, and Computers},
+  title     = {Convolutional Dictionary Learning for Multi-Channel Signals},
+  year      = {2018},
+  month     = {Oct},
+  pages     = {335-342},
+  abstract  = {There has recently been a rapid growth in interest in the design of efficient algorithms for convolutional sparse coding, and in the application of these methods to signal and image processing inverse problems. Thus far, however, the design of algorithms and methods for multi-channel signals has received very little attention. In this work we extend our initial results in convolutional sparse coding and dictionary learning for this type of data, proposing new algorithms that scale well to signals with large numbers of channels, and demonstrate their performance in an application involving hyperspectral imagery.},
+  doi       = {10.1109/ACSSC.2018.8645108},
+  keywords  = {convolutional neural nets;inverse problems;learning (artificial intelligence);signal processing;signal representation;hyperspectral imagery;convolutional dictionary learning;multichannel signals;image processing inverse problems;convolutional sparse coding;Dictionaries;Convolutional codes;Convolution;Training;Machine learning;Image coding;Encoding},
+}
+
+@InProceedings{8730236,
+  author    = {J. {Quesada} and G. {Silva} and P. {Rodriguez} and B. {Wohlberg}},
+  booktitle = {2019 XXII Symposium on Image, Signal Processing and Artificial Vision (STSIVA)},
+  title     = {Combinatorial Separable Convolutional Dictionaries},
+  year      = {2019},
+  month     = {April},
+  pages     = {1-5},
+  abstract  = {Recent works have considered the use of a linear combination of separable filters to approximate a non-separable filter bank (FB) to obtain computational advantages in CNNs and convolutional sparse representations/coding (CSR/CSC). However, it has been recently shown that there are advantages to directly solving the convolutional dictionary learning (CDL) problem considering a separable FB. A separable filter bank of M 2-d filters is typically constructed from a paired set of M horizontal filters and M vertical filters. In contrast, here we propose an outer product construction involving all possible combinations of vertical and horizontal filters, so that M vertical and M horizontal filters generate M2 2-d filters. Our computational experiments show that this alternative form results in a reduction in computation time of 10% and 80% for the CDL and CSC problems respectively, while matching the reconstruction performance of the typical separable FB approach for the same cardinality.},
+  doi       = {10.1109/STSIVA.2019.8730236},
+  keywords  = {channel bank filters;combinatorial mathematics;compressed sensing;convolution;signal reconstruction;signal representation;typical separable FB approach;combinatorial separable convolutional dictionaries;nonseparable filter bank;convolutional sparse representations/coding;CSR/CSC;convolutional dictionary learning problem;separable filter bank;outer product construction;vertical filters;horizontal filters;computational experiments;computation time;Dictionaries;Convolutional codes;Convolution;Noise reduction;Machine learning;Runtime;Image reconstruction;Convolutional Sparse Representation;Dictionary Learning;Separable Filters},
+}
+
+@InProceedings{wohlberg2016boundary,
+  author    = {B. {Wohlberg}},
+  booktitle = {2016 IEEE International Conference on Image Processing (ICIP)},
+  title     = {Boundary handling for convolutional sparse representations},
+  year      = {2016},
+  month     = {Sep.},
+  pages     = {1833-1837},
+  abstract  = {Convolutional sparse representations differ from the standard form in representing the signal to be decomposed as the sum of a set of convolutions with dictionary filters instead of a linear combination of dictionary vectors. The advantage of the convolutional form is that it provides a single-valued representation optimised over an entire signal. The substantial computational cost of the convolutional sparse coding and dictionary learning problems has recently been shown to be greatly reduced by solving in the frequency domain, but the periodic boundary conditions imposed by this approach have the potential to create boundary artifacts. The present paper compares different approaches to avoiding these effects in both sparse coding and dictionary learning.},
+  doi       = {10.1109/ICIP.2016.7532675},
+  keywords  = {convolution;encoding;filtering theory;frequency-domain analysis;signal representation;boundary handling;convolutional sparse representations;signal decomposition;dictionary filters;single-valued representation;convolutional sparse coding;dictionary learning problems;frequency domain;periodic boundary conditions;Dictionaries;Convolution;Encoding;Convolutional codes;Discrete Fourier transforms;Standards;Boundary conditions;Convolutional Sparse Coding;Convolutional Dictionary Learning;Boundary Effects},
+}
+
+@Article{DBLP:journals/corr/WohlbergR17,
+  author        = {Brendt Wohlberg and Paul Rodr{\'{\i}}guez},
+  journal       = {CoRR},
+  title         = {Convolutional Sparse Coding: Boundary Handling Revisited},
+  year          = {2017},
+  volume        = {abs/1707.06718},
+  archiveprefix = {arXiv},
+  bibsource     = {dblp computer science bibliography, https://dblp.org},
+  biburl        = {https://dblp.org/rec/bib/journals/corr/WohlbergR17},
+  eprint        = {1707.06718},
+  timestamp     = {Mon, 13 Aug 2018 16:46:27 +0200},
+  url           = {http://arxiv.org/abs/1707.06718},
+}
+
+@Article{ioffe2015batch,
+  author  = {Ioffe, Sergey and Szegedy, Christian},
+  journal = {arXiv preprint arXiv:1502.03167},
+  title   = {Batch normalization: Accelerating deep network training by reducing internal covariate shift},
+  year    = {2015},
+}
+
+@InProceedings{salimans2016weight,
+  author    = {Salimans, Tim and Kingma, Durk P},
+  booktitle = {Advances in Neural Information Processing Systems},
+  title     = {Weight normalization: A simple reparameterization to accelerate training of deep neural networks},
+  year      = {2016},
+  pages     = {901--909},
+}
+
+@InProceedings{pmlr-v9-glorot10a,
+  author    = {Xavier Glorot and Yoshua Bengio},
+  booktitle = {Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics},
+  title     = {Understanding the difficulty of training deep feedforward neural networks},
+  year      = {2010},
+  address   = {Chia Laguna Resort, Sardinia, Italy},
+  editor    = {Yee Whye Teh and Mike Titterington},
+  month     = {13--15 May},
+  pages     = {249--256},
+  publisher = {PMLR},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {9},
+  abstract  = {Whereas before 2006 it appears that deep multi-layer neural networks were not successfully trained, since then several algorithms have been shown to successfully train them, with experimental results showing the superiority of deeper vs less deep architectures. All these experimental results were obtained with new initialization or training mechanisms. Our objective here is to understand better why standard gradient descent from random initialization is doing so poorly with deep neural networks, to better understand these recent relative successes and help design better algorithms in the future.  We first observe the influence of the non-linear activations functions. We find that the logistic sigmoid activation is unsuited for deep networks with random initialization because of its mean value, which can drive especially the top hidden layer into saturation. Surprisingly, we find that saturated units can move out of saturation by themselves, albeit slowly, and explaining the plateaus sometimes seen when training neural networks. We find that a new non-linearity that saturates less can often be beneficial. Finally, we study how activations and gradients vary across layers and during training, with the idea that training may be more difficult when the singular values of the Jacobian associated with each layer are far from 1.  Based on these considerations, we propose a new initialization scheme that brings substantially faster convergence.},
+  pdf       = {http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf},
+  url       = {http://proceedings.mlr.press/v9/glorot10a.html},
+}
+
+@InProceedings{He_2015_ICCV,
+  author    = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  booktitle = {The IEEE International Conference on Computer Vision (ICCV)},
+  title     = {Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification},
+  year      = {2015},
+  month     = {December},
+}
+
+@InCollection{lecun2012efficient,
+  author    = {LeCun, Yann A and Bottou, L{\'e}on and Orr, Genevieve B and M{\"u}ller, Klaus-Robert},
+  booktitle = {Neural networks: Tricks of the trade},
+  publisher = {Springer},
+  title     = {Efficient backprop},
+  year      = {2012},
+  pages     = {9--48},
+}
+
+@InProceedings{chen2011hierarchical,
+  author    = {Chen, Bo and Polatkan, Gungor and Sapiro, Guillermo and Carin, Lawrence and Dunson, David B},
+  booktitle = {Proceedings of the 28th International Conference on Machine Learning (ICML-11)},
+  title     = {The hierarchical beta process for convolutional factor analysis and deep learning},
+  year      = {2011},
+  pages     = {361--368},
+}
+
+@Article{chen2013deep,
+  author    = {Chen, Bo and Polatkan, Gungor and Sapiro, Guillermo and Blei, David and Dunson, David and Carin, Lawrence},
+  journal   = {IEEE transactions on pattern analysis and machine intelligence},
+  title     = {Deep learning with hierarchical convolutional factor analysis},
+  year      = {2013},
+  number    = {8},
+  pages     = {1887--1901},
+  volume    = {35},
+  publisher = {IEEE},
+}
+
+@Article{pu2014generative,
+  author  = {Pu, Yunchen and Yuan, Xin and Carin, Lawrence},
+  journal = {arXiv preprint arXiv:1412.6039},
+  title   = {Generative deep deconvolutional learning},
+  year    = {2014},
+}
+
+@InProceedings{zhang2018nonlocal,
+  author    = {Zhang, Xinyuan and Yuan, Xin and Carin, Lawrence},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  title     = {Nonlocal low-rank tensor factor analysis for image restoration},
+  year      = {2018},
+  pages     = {8232--8241},
+}
+
+@Article{aharon2006k,
+  author    = {Aharon, Michal and Elad, Michael and Bruckstein, Alfred},
+  journal   = {IEEE Transactions on signal processing},
+  title     = {K-SVD: An algorithm for designing overcomplete dictionaries for sparse representation},
+  year      = {2006},
+  number    = {11},
+  pages     = {4311--4322},
+  volume    = {54},
+  publisher = {IEEE},
+}
+
+@InProceedings{kong2012dictionary,
+  author       = {Kong, Shu and Wang, Donghui},
+  booktitle    = {European conference on computer vision},
+  title        = {A dictionary learning approach for classification: separating the particularity and the commonality},
+  year         = {2012},
+  organization = {Springer},
+  pages        = {186--199},
+}
+
+@Article{song2018robust,
+  author    = {Song, Zhiguo and Sun, Jifeng and Yu, Jialin and Liu, Shengqing},
+  journal   = {Algorithms},
+  title     = {Robust Visual Tracking via Patch Descriptor and Structural Local Sparse Representation},
+  year      = {2018},
+  number    = {8},
+  pages     = {126},
+  volume    = {11},
+  publisher = {Multidisciplinary Digital Publishing Institute},
+}
+
+@Article{carroll2017outlier,
+  author    = {Carroll, Brandon T and Whitaker, Bradley M and Dayley, Wayne and Anderson, David V},
+  journal   = {IEEE/ACM Transactions on Audio, Speech, and Language Processing},
+  title     = {Outlier learning via augmented frozen dictionaries},
+  year      = {2017},
+  number    = {6},
+  pages     = {1207--1215},
+  volume    = {25},
+  publisher = {IEEE},
+}
+
+@InProceedings{gu2015convolutional,
+  author    = {Gu, Shuhang and Zuo, Wangmeng and Xie, Qi and Meng, Deyu and Feng, Xiangchu and Zhang, Lei},
+  booktitle = {Proceedings of the IEEE International Conference on Computer Vision},
+  title     = {Convolutional sparse coding for image super-resolution},
+  year      = {2015},
+  pages     = {1823--1831},
+}
+
+@InProceedings{wohlberg2016convolutional,
+  author       = {Wohlberg, Brendt},
+  booktitle    = {2016 IEEE 12th Image, Video, and Multidimensional Signal Processing Workshop (IVMSP)},
+  title        = {Convolutional sparse representations as an image model for impulse noise restoration},
+  year         = {2016},
+  organization = {IEEE},
+  pages        = {1--5},
+}
+
+@InProceedings{papyan2017localprocessing,
+  author    = {Papyan, Vardan and Romano, Yaniv and Sulam, Jeremias and Elad, Michael},
+  booktitle = {Proceedings of the IEEE International Conference on Computer Vision},
+  title     = {Convolutional dictionary learning via local processing},
+  year      = {2017},
+  pages     = {5296--5304},
+}
+
+@Article{osborne2000lasso,
+  author    = {Osborne, Michael R and Presnell, Brett and Turlach, Berwin A},
+  journal   = {Journal of Computational and Graphical statistics},
+  title     = {On the lasso and its dual},
+  year      = {2000},
+  number    = {2},
+  pages     = {319--337},
+  volume    = {9},
+  publisher = {Taylor \& Francis},
+}
+
+@InProceedings{chodosh2018deep,
+  author       = {Chodosh, Nathaniel and Wang, Chaoyang and Lucey, Simon},
+  booktitle    = {Asian Conference on Computer Vision},
+  title        = {Deep convolutional compressed sensing for lidar depth completion},
+  year         = {2018},
+  organization = {Springer},
+  pages        = {499--513},
+}
+
+@InProceedings{murdock2018deep,
+  author    = {Murdock, Calvin and Chang, MingFang and Lucey, Simon},
+  booktitle = {Proceedings of the European Conference on Computer Vision (ECCV)},
+  title     = {Deep component analysis via alternating direction neural networks},
+  year      = {2018},
+  pages     = {820--836},
+}
+
+@InProceedings{zeiler2010deconvolutional,
+  author       = {Zeiler, Matthew D and Krishnan, Dilip and Taylor, Graham W and Fergus, Rob},
+  booktitle    = {2010 IEEE Computer Society Conference on computer vision and pattern recognition},
+  title        = {Deconvolutional networks},
+  year         = {2010},
+  organization = {IEEE},
+  pages        = {2528--2535},
+}
+
+@Article{polatkan2014bayesian,
+  author    = {Polatkan, G{\"u}ng{\"o}r and Zhou, Mingyuan and Carin, Lawrence and Blei, David and Daubechies, Ingrid},
+  journal   = {IEEE transactions on pattern analysis and machine intelligence},
+  title     = {A Bayesian nonparametric approach to image super-resolution},
+  year      = {2014},
+  number    = {2},
+  pages     = {346--358},
+  volume    = {37},
+  publisher = {IEEE},
+}
+
+@Article{papyan2017convolutional,
+  author    = {Papyan, Vardan and Romano, Yaniv and Elad, Michael},
+  journal   = {The Journal of Machine Learning Research},
+  title     = {Convolutional neural networks analyzed via convolutional sparse coding},
+  year      = {2017},
+  number    = {1},
+  pages     = {2887--2938},
+  volume    = {18},
+  publisher = {JMLR. org},
+}
+
+@Article{boyd2011distributed,
+  author    = {Boyd, Stephen and Parikh, Neal and Chu, Eric and Peleato, Borja and Eckstein, Jonathan and others},
+  journal   = {Foundations and Trends{\textregistered} in Machine learning},
+  title     = {Distributed optimization and statistical learning via the alternating direction method of multipliers},
+  year      = {2011},
+  number    = {1},
+  pages     = {1--122},
+  volume    = {3},
+  publisher = {Now Publishers, Inc.},
+}
+
+@Article{beck2009fast,
+  author    = {Beck, Amir and Teboulle, Marc},
+  journal   = {SIAM journal on imaging sciences},
+  title     = {A fast iterative shrinkage-thresholding algorithm for linear inverse problems},
+  year      = {2009},
+  number    = {1},
+  pages     = {183--202},
+  volume    = {2},
+  publisher = {SIAM},
+}
+
+@InProceedings{zhang2010discriminative,
+  author       = {Zhang, Qiang and Li, Baoxin},
+  booktitle    = {2010 IEEE Computer Society Conference on Computer Vision and Pattern Recognition},
+  title        = {Discriminative K-SVD for dictionary learning in face recognition},
+  year         = {2010},
+  organization = {IEEE},
+  pages        = {2691--2698},
+}
+
+@Article{mairal2011task,
+  author    = {Mairal, Julien and Bach, Francis and Ponce, Jean},
+  journal   = {IEEE transactions on pattern analysis and machine intelligence},
+  title     = {Task-driven dictionary learning},
+  year      = {2011},
+  number    = {4},
+  pages     = {791--804},
+  volume    = {34},
+  publisher = {IEEE},
+}
+
+
+@Misc{PURR1947,
+  author = {Baumgardner, M. F. and Biehl, L. L. and Landgrebe, D. A.},
+  month  = {Sep},
+  title  = {220 Band AVIRIS Hyperspectral Image Data Set: June 12, 1992 Indian Pine Test Site 3},
+  year   = {2015},
+  doi    = {doi:/10.4231/R7RX991C},
+  url    = {https://purr.purdue.edu/publications/1947/1},
+}
+
+@Article{garcia2018convolutional,
+  author    = {Garcia-Cardona, Cristina and Wohlberg, Brendt},
+  journal   = {IEEE Transactions on Computational Imaging},
+  title     = {Convolutional dictionary learning: A comparative review and new algorithms},
+  year      = {2018},
+  number    = {3},
+  pages     = {366--381},
+  volume    = {4},
+  publisher = {IEEE},
+}
+
+@Article{liu2018first,
+  author    = {Liu, Jialin and Garcia-Cardona, Cristina and Wohlberg, Brendt and Yin, Wotao},
+  journal   = {SIAM Journal on Imaging Sciences},
+  title     = {First-and second-order methods for online convolutional dictionary learning},
+  year      = {2018},
+  number    = {2},
+  pages     = {1589--1628},
+  volume    = {11},
+  publisher = {SIAM},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

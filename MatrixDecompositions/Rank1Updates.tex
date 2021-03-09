@@ -1,0 +1,367 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+\section{Standard: Number of Channels $>$ Number of Filters}
+
+I need to update the Cholesky decomposition of the following matrix:
+
+\begin{equation}
+\rho\mId + \mD^H\mD
+\end{equation}
+
+where the low-rank update takes the form:
+
+\begin{equation}
+\mD^{(k+1)} = \mD^{(k)} + \vu\vv^H
+\end{equation}
+
+The low-rank update produces the following equation.
+
+\begin{equation}
+\rho\mId + (\mD + \vu\vv^H)^H(\mD + \vu\vv^H) = \rho\mId + \mD^H\mD + \vu^H\vu \vv\vv^H + \vv\vu^H\mD + \mD^H\vu\vv^H
+\end{equation}
+
+The last two terms are nonHermitian, but their sum is Hermitian. The eigendecomposition of their sum expands the sum into two Hermitian terms. So, my task is to compute the eigendecomposition\footnote{More specifically, I need to compute an eigendecomposition with orthogonal eigenvectors, so that the terms of the decomposition expansion are Hermitian. The matrix is Hermitian, so the eigendecomposition with orthogonal eigenvectors exists.}  of this expression.
+
+\begin{equation}
+\begin{bmatrix}
+\vv & \mD^H\vu 
+\end{bmatrix}
+\begin{bmatrix}
+\mD^H\vu & \vv
+\end{bmatrix}^H = \vv\vu^H \mD + \mD^H\vu\vv^H
+\end{equation}
+
+While matrix products are not communitive, some of the eigenvalues of matrix products are communitive.
+
+Furthermore, the eigenvectors of $\mA\mB$ and $\mB\mA$ are related:
+
+\begin{equation}
+\mB\mA\vx = \lambda\vx  \implies  \mA\mB\mA\vx = \lambda\mA\vx
+\end{equation}
+
+So, if $\vx$ is an eigenvector of $\mB\mA$, $\mA\vx$ is an eigenvector of $\mA\mB$.
+
+
+\begin{equation}
+\begin{bmatrix}
+\mD^H\vu & \vv
+\end{bmatrix}^H
+\begin{bmatrix}
+\vv & \mD^H\vu 
+\end{bmatrix}
+ = 
+\begin{bmatrix}
+\vu^H\mD\vv & \vu^H\mD\mD^H\vu \\
+\vv^H\vv    & \vv^H\mD^H\vu
+\end{bmatrix}
+\end{equation}
+
+The eigenvalues and corresponding eigenvectors of a $2 \times 2$ matrix can be computed using the quadradic formula. Assuming that the $2 \times 2$ matrix has $2$ distinct eigenvalues, the expressions for these are below.\footnote{It is not guarenteed the $2 \times 2$ matrix will have $2$ distinct eigenvalues. In the practical considerations section, I consider those cases.}
+
+\begin{equation}
+\operatorname{eigvals}(\begin{bmatrix} a & b \\ c & d \end{bmatrix}) = \frac{a + d}{2} \pm \sqrt{(\frac{a - d}{2})^2 + bc}
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvals}(\begin{bmatrix} a & b \\ c & a^* \end{bmatrix}) = \operatorname{real}(a) \pm \sqrt{bc - (\operatorname{imag}(a))^2}
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvecs}(\begin{bmatrix} a & b \\ c & d \end{bmatrix}) = \begin{bmatrix} b \\ \frac{d - a}{2} \pm \sqrt{(\frac{a - d}{2})^2 + bc}\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvecs}(\begin{bmatrix} a & b \\ c & a^* \end{bmatrix}) = \begin{bmatrix} b \\ -j\operatorname{imag}(a) \pm \sqrt{bc - (\operatorname{imag}(a))^2}\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvals}(\begin{bmatrix}
+\vu^H\mD\vv & \vu^H\mD\mD^H\vu \\
+\vv^H\vv    & \vv^H\mD^H\vu
+\end{bmatrix})
+= \operatorname{real}(\vu^H\mD\vv) \pm \sqrt{\vv^H\vv\vu^H\mD\mD^H\vu - (\operatorname{imag}(\vu^H\mD\vv))^2}
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvecs}
+(\begin{bmatrix}
+\vu^H\mD\vv & \vu^H\mD\mD^H\vu \\
+\vv^H\vv    & \vv^H\mD^H\vu
+\end{bmatrix})
+= \begin{bmatrix}
+\vu^H\mD\mD^H\vu \\
+-j\operatorname{imag}(\vu^H\mD\vv) \pm \sqrt{\vv^H\vv\vu^H\mD\mD^H\vu - (\operatorname{imag}(\vu^H\mD\vv))^2}
+\end{bmatrix}
+\end{equation}
+
+Therefore,
+
+\begin{equation}
+\operatorname{eigvecs}
+(
+\vv\vu^H\mD + \mD^H\vu\vv^H
+) = 
+\vu^H\mD\mD^H\vu\vv +
+(-j\operatorname{imag}(\vu^H\mD\vv) \pm \sqrt{\vv^H\vv\vu^H\mD\mD^H\vu - (\operatorname{imag}(\vu^H\mD\vv))^2})\mD^H\vu
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvals}(
+\vv\vu^H\mD + \mD^H\vu\vv^H
+)
+= \operatorname{real}(\vu^H\mD\vv) \pm \sqrt{\vv^H\vv\vu^H\mD\mD^H\vu - (\operatorname{imag}(\vu^H\mD\vv))^2}
+\end{equation}
+
+\section{Transposed Version: Number of Channels $<$ Number of Filters}
+
+Alternatively, the form
+
+\begin{equation}
+\rho\mId + \mD\mD^H
+\end{equation}
+
+can be used exploiting by exploiting the Woodbury Matrix Lemma. As before, a rank-$1$ dictionary update takes the form:
+
+\begin{equation}
+\mD^{(k+1)} = \mD^{(k)} + \vu\vv^H
+\end{equation}
+
+The low-rank update produces the following equation:
+
+\begin{equation}
+\rho\mId + (\mD + \vu\vv^H)(\mD + \vu\vv^H)^H = \rho\mId + \mD\mD^H + \vv^H\vv \vu\vu^H + \vu\vv^H\mD^H + \mD\vv\vu^H
+\end{equation}
+
+As in the previous case, the last two terms are nonHermitian, but their sum is Hermitian. So, my task, as before, is to compute the eigendecomposition of this expression.
+
+\begin{equation}
+\begin{bmatrix}
+\vu & \mD\vv 
+\end{bmatrix}
+\begin{bmatrix}
+\mD\vv & \vu
+\end{bmatrix}^H = \vu\vv^H \mD^H + \mD\vv\vu^H
+\end{equation}
+
+
+If $\vx$ is an eigenvector of $\mB\mA$, $\mA\vx$ is an eigenvector of $\mA\mB$.
+
+
+\begin{equation}
+\begin{bmatrix}
+\mD\vv & \vu
+\end{bmatrix}^H
+\begin{bmatrix}
+\vu & \mD\vv 
+\end{bmatrix}
+ = 
+\begin{bmatrix}
+\vv^H\mD^H\vu & \vv^H\mD^H\mD\vv \\
+\vu^H\vu    & \vu^H\mD\vv
+\end{bmatrix}
+\end{equation}
+
+The eigenvalues and corresponding eigenvectors of a $2 \times 2$ matrix can be computed using the quadradic formula.
+
+\begin{equation}
+\operatorname{eigvals}(\begin{bmatrix} a & b \\ c & a^* \end{bmatrix}) = \operatorname{real}(a) \pm \sqrt{bc - (\operatorname{imag}(a))^2}
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvecs}(\begin{bmatrix} a & b \\ c & a^* \end{bmatrix}) = \begin{bmatrix} b \\ -j\operatorname{imag}(a) \pm \sqrt{bc - (\operatorname{imag}(a))^2}\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvals}(\begin{bmatrix}
+\vv^H\mD\vu & \vv^H\mD^H\mD\vv \\
+\vu^H\vu    & \vu^H\mD\vv
+\end{bmatrix})
+= \operatorname{real}(\vv^H\mD^H\vu) \pm \sqrt{\vu^H\vu\vv^H\mD^H\mD\vv - (\operatorname{imag}(\vv^H\mD^H\vu))^2}
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvecs}
+(\begin{bmatrix}
+\vv^H\mD^H\vu & \vv^H\mD^H\mD\vv \\
+\vu^H\vu    & \vu^H\mD\vv
+\end{bmatrix})
+= \begin{bmatrix}
+\vv^H\mD^H\mD\vv \\
+-j\operatorname{imag}(\vv^H\mD^H\vu) \pm \sqrt{\vu^H\vu\vv^H\mD^H\mD\vv - (\operatorname{imag}(\vv^H\mD^H\vu))^2}
+\end{bmatrix}
+\end{equation}
+
+Therefore,
+
+\begin{equation}
+\operatorname{eigvecs}
+(
+\vu\vv^H\mD^H + \mD\vv\vu^H
+) = 
+\vv^H\mD^H\mD\vv\vu +
+(-j\operatorname{imag}(\vv^H\mD^H\vu) \pm \sqrt{\vu^H\vu\vv^H\mD^H\mD\vv - (\operatorname{imag}(\vv^H\mD^H\vu))^2})\mD\vv
+\end{equation}
+
+\begin{equation}
+\operatorname{eigvals}(
+\vu\vv^H \mD^H + \mD\vv\vu^H
+)
+= \operatorname{real}(\vv^H\mD^H\vu) \pm \sqrt{\vu^H\vu\vv^H\mD^H\mD\vv - (\operatorname{imag}(\vv^H\mD^H\vu))^2}
+\end{equation}
+
+\section{Practical Considerations}
+\subsection{Fewer Eigenvectors}
+
+Starting with linear algebra principles:
+
+\begin{equation}
+\mB\mA\vx = \lambda\vx \implies \mA\mB(\mA\vx) = \lambda (\mA\vx)
+\end{equation}
+
+Furthermore,
+\begin{equation}
+\mA\mB\vy = \lambda\vy \implies \mB\mA(\mB\vy) = \lambda (\mB\vy)
+\end{equation}
+
+If eigenvector $\vy$ is in the nullspace of matrix $\mB$, $\vy$ cannot be "discovered" by applying matrix $\mA$ to an eigenvector of $\mB\mA$.
+
+\subsubsection{Standard: Number of Channels $>$ Number of Filters}
+
+\begin{equation}
+\mB = \begin{bmatrix} \mD^H\vu & \vv\end{bmatrix}^H
+\end{equation}
+
+
+The matrix $\mA\mB$ is a Hermitian $M \times M$ matrix, so it has $M$ real eigenvalues and $M$ independent eigenvectors which can be chosen to be orthogonal. Therefore, $\mB\mA$ has $2$ independent eigenvectors if $\mB$ is rank $2$.  What could cause matrix $\mB$ to be less than rank $2$?
+
+
+\begin{enumerate}
+\item
+\begin{equation}
+\mD^H\vu = \vzero
+\end{equation}
+\item
+
+\begin{equation}
+\vv = \vzero
+\end{equation}
+\item
+\begin{equation}
+\mD^H\vu = \alpha \vv
+\end{equation}
+\end{enumerate}
+
+In the first $2$ cases, the matrix $\mB\mA$ has one independent eigenvector. The first case implies that only the Hermitian update is nonzero.  The second case implies that the entire update is zero. (The eigenvalues are zero, so as long as the normalization of eigenvectors is handled with care, it is not necessary to check for these cases in code.)
+
+In the third case, the diagonalization of $\mA\mB$ can be determined directly without using the $2 \times 2$ matrix $\mB\mA$.
+
+\begin{equation}
+\mA\mB = 2\operatorname{real}(\alpha)\vv\vv^H
+\end{equation}
+
+\begin{equation}
+\lambda = 2\operatorname{real}(\alpha) \|\vv\|_2^2
+\end{equation}
+
+\begin{equation}
+\vx = \frac{\vv}{\|\vv\|_2}
+\end{equation}
+
+The rest of the eigenvalues are zero.  (The corresponding $2 \times 2$ matrix $\mB\mA$ shares the same nonzero eigenvalue. The eigenvector that is lost has an eigenvalue of zero, so like in the other $2$ cases, it is not necessary to check for this case in code.)
+
+
+\subsubsection{Transposed: Number of Channels $<$ Number of Filters}
+
+
+
+\begin{equation}
+\mB = \begin{bmatrix} \mD\vv & \vu\end{bmatrix}^H
+\end{equation}
+
+
+The matrix $\mA\mB$ is a Hermitian $C \times C$ matrix, so it has $C$ real eigenvalues and $C$ independent eigenvectors which can be chosen to be orthogonal. Therefore, $\mB\mA$ has $2$ independent eigenvectors if $\mB$ is rank $2$.  What could cause matrix $\mB$ to be less than rank $2$?
+
+\begin{enumerate}
+\item
+\begin{equation}
+\mD\vv = \vzero
+\end{equation}
+\item
+
+\begin{equation}
+\vu = \vzero
+\end{equation}
+\item
+\begin{equation}
+\mD\vv = \alpha \vu
+\end{equation}
+\end{enumerate}
+
+The first case implies that only the Hermitian update is nonzero.  The second case implies that the entire update is zero.
+
+In the third case, the diagonalization of $\mA\mB$ can be determined directly without using $2 \times 2$ matrix $\mB\mA$.
+
+\begin{equation}
+\mA\mB = 2\operatorname{real}(\alpha)\vu\vu^H
+\end{equation}
+
+\begin{equation}
+\lambda = 2\operatorname{real}(\alpha) \|\vu\|_2^2
+\end{equation}
+
+\begin{equation}
+\vx = \frac{\vu}{\|\vu\|_2}
+\end{equation}
+
+The rest of the eigenvalues are zero.  (The corresponding $2 \times 2$ matrix $\mB\mA$ shares the same nonzero eigenvalue. The eigenvector that is lost has an eigenvalue of zero, so like in the other $2$ cases, it is not necessary to check for this case in code.)
+
+\subsection{Identical Eigenvalues}
+
+If the pair of eigenvalues are the same, then all nonzero vectors are eigenvectors of $\mB\mA$. However, it is necessary for a diagonalization expansion with only Hermitian terms that the eigenvectors of $\mA\mB$ are chosen to be orthogonal, which can be found using a Gram-Schmidt process. This case is not just a theoretical concern; it is necessary to check for this in code.
+
+\subsubsection{Standard: Number of Channels $>$ Number of Filters}
+
+Suppose these eigenvectors are chosen for the $2 \times 2$ matrix:
+
+\begin{equation}
+\vx_1 = \begin{bmatrix}
+1 \\
+0
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vx_2 = \begin{bmatrix}
+-\frac{\vv^H\mD^H\vu}{\vv^H\vv} \\
+1
+\end{bmatrix}
+\end{equation}
+
+The corresponding eigenvectors $\mA\vx_i$ of matrix $\mA\mB$ are orthogonal.
+
+\subsubsection{Transposed: Number of Channels $<$ Number of Filters}
+Suppose these eigenvectors are chosen for the $2 \times 2$ matrix:
+
+\begin{equation}
+\vx_1 = \begin{bmatrix}
+1 \\
+0
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vx_2 = \begin{bmatrix}
+-\frac{\vu^H\mD\vv}{\vu^H\vu} \\
+1
+\end{bmatrix}
+\end{equation}
+
+The corresponding eigenvectors $\mA\vx_i$ of matrix $\mA\mB$ are orthogonal.
+
+\end{document}

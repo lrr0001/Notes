@@ -1,0 +1,255 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+Let's start with the following optimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\mX,\mD} & \frac{1}{2}\|\mS - \mW\mD\mX\|_2^2 + \lambda\|\mX\|_1 \\
+\text{subject to } & (\mId - \mP)\mD = 0
+\end{aligned}
+\end{equation}
+
+where $\mP$ projects the dictionary to meet dictionary constraints.
+
+The problem is not convex. Rather than solve for $\mX$ and $\mD$ concurrently, we can alternate updates between them.
+
+For fixed $\mD$, solve:
+\begin{equation}
+\min_{\mX} & \frac{1}{2}\|\mS - \mW\mD\mX\|_2^2 + \lambda\|\mX\|_1
+\end{equation}
+
+We can solve for $\vx$ for each signal $vs$ individually:
+
+For fixed $\mD$, solve:
+\begin{equation}
+\min_{\vx} & \frac{1}{2}\|\vs - \mW\mD\vx\|_2^2 + \lambda\|\vx\|_1
+\end{equation}
+
+For fixed $\mX$ solve:
+\begin{equation}
+\begin{aligned}
+\min_{\mD} & \frac{1}{2}\|\mS - \mW\mD\mX\|_2^2 \\
+\text{subject to } & (\mId - \mP)\mD = 0
+\end{aligned}
+\end{equation}
+
+Let's look at the update for $\mD$:
+
+Zeropad to make the dimensions work.
+
+\begin{equation}
+\begin{aligned}
+\min_{\mD} & \frac{1}{2}\|\mW(\mS^T - \mX^T\mD^T)^T\|_2^2 \\
+\text{subject to } & (\mId - \mP)\mD = 0
+\end{aligned}
+\end{equation}
+
+For fixed $\mX$, the channel updates are independent.
+
+\begin{equation}
+\begin{aligned}
+\min_{\vd} & \frac{1}{2}\|\mW(\vs - \mX^T\vd)\|_2^2 \\
+\text{subject to } & (\mId - \mP)\vd = 0
+\end{aligned}
+\end{equation}
+
+This can be solved using projected gradient descent.
+
+\begin{equation}
+\frac{ \partial}{\partial \vd} \frac{1}{2}\|\mW(\vs - \mX^T\vd)\|_2^2 = \frac{\partial}{\partial \vd} (\vs - \mX^T\vd)^T\mW^T\mW(\vs - \mX^T\vd)
+\end{equation}
+
+\begin{equation}
+\frac{ \partial}{\partial \vd} \frac{1}{2}\|\mW(\vs - \mX^T\vd)\|_2^2 = \mX\mW^T\mW(\mX^T\vd - \vs)
+\end{equation}
+
+The matrix $\mX^T$ is a convolution operator efficiently computed in frequency domain.
+
+The matrix $\mW^T\mW$ is an operator that zeros out the elements that aren't supposed to contribute.
+
+
+Let's look at the update for $\vx$:
+
+Consider the optimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx,\vy,\vz} & \frac{1}{2}\|\vs - \mW\vy\|_2^2 + \lambda\|\vz\|_1 \\
+\text{subject to } & \mR^{-1}\vz - \mR^{-1}\vx = 0 \\
+                   & \vy -\mD\vx = 0
+\end{aligned}
+\end{equation}
+
+This optimization problem has the Lagrangian function:
+
+\begin{equation}
+\operatorname{L}(\vx,\vy,\vz,\vgamma,\veta) = \frac{1}{2}\|\vs - \mW\vy\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H\mR^{-1}(\vz - \vx) + \veta^H(\vy - \mD\vx)
+\end{equation}
+
+Now, we can augment the Lagrangian.
+
+\begin{equation}
+\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \frac{1}{2}\|\vs - \mW\vy\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H\mR^{-1}(\vz - \vx) + \veta^H(\vy - \mD\vx) + \frac{\rho}{2}\|\mR^{-1}(\vz - \vx)\|_2^2 + \frac{\rho}{2}\|\vy - \mD\vx\|_2^2
+\end{equation}
+
+\begin{equation}
+\nabla_{\vx}\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = -\mR^{-1}\vgamma - \mD^H\veta + \rho\mR^{-2}\vx - \rho\mR^{-2}\vz + \rho\mD^H\mD\vx - \rho\mD^H\vy
+\end{equation}
+
+For $\vx,\vy,\vz,\veta,\vgamma$ such that $\nabla_{\vx}\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = 0$:
+
+\begin{equation}
+(\mR^{-2} + \mD^H\mD)\vx = \mR^{-2}\vz + \frac{\mR^{-1} \vgamma}{\rho} + \mD^H\vy + \frac{\mD^H\veta}{\rho}
+\end{equation}
+
+\begin{equation}
+\mR^{-1}(\mId + (\mD\mR)^H(\mD\mR))\mR^{-1}\vx = \mR^{-2}\vz + \frac{\mR^{-1} \vgamma}{\rho} + \mD^H\vy + \frac{\mD^H\veta}{\rho}
+\end{equation}
+
+\begin{equation}
+(\mId + (\mD\mR)^H(\mD\mR))\mR^{-1}\vx = \mR^{-1}\vz + \frac{\vgamma}{\rho} + (\mD\mR)^H\vy + \frac{(\mD\mR)^H\veta}{\rho}
+\end{equation}
+
+\begin{equation}
+\mR^{-1}\vx = (\mId + (\mD\mR)^H(\mD\mR))^{-1}(\mR^{-1}\vz + \frac{\vgamma}{\rho} + (\mD\mR)^H\vy + \frac{(\mD\mR)^H\veta}{\rho})
+\end{equation}
+
+\begin{equation}
+\min_{\vx} \operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \mR(\mId + (\mD\mR)^H(\mD\mR))^{-1}(\mR^{-1}\vz + \frac{\vgamma}{\rho} + (\mD\mR)^H\vy + \frac{(\mD\mR)^H\veta}{\rho})
+\end{equation}
+
+\begin{equation}
+\nabla_{\vy}\operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \mW^H\mW\vy - \mW^H\vs + \veta + \rho\vy - \rho\mD\vx
+\end{equation}
+
+\begin{equation}
+\min_{\vy} \operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = (\rho\mId + \mW^T\mW)^{-1}(\mW\vs + \rho(\mD\vx - \frac{\veta}{\rho}))
+\end{equation}
+
+\begin{equation}
+\min_{\vy} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = \begin{cases}
+\frac{1}{1 + \rho}(\vs + \rho(\mD\vx - \frac{\veta}{\rho})) & \text{within signal domain}\\
+\mD\vx - \frac{\veta}{\rho} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\min_{\vz} \operatorname{L}_{\rho}(\vx,\vy,\vz,\veta,\vgamma) = \operatorname{S}_{\frac{\lambda\mR^2}{\rho}}(\vx - \frac{\mR\vgamma}{\rho})
+\end{equation}
+
+From this, we can get the update equations:
+\begin{equation}
+\vx^{(k + 1)} = \mR(\mId + (\mD\mR)^H(\mD\mR))^{-1}(\mR^{-1}\vz^{(k)} + \frac{\vgamma^{(k)}}{\rho} + (\mD\mR)^H\vy^{(k)} + \frac{(\mD\mR)^H\veta^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)}= \begin{cases}
+\frac{1}{1 + \rho}(\vs + \rho(\mD\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho})) & \text{within signal domain}\\
+\mD\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\vz^{(k + 1)}= \operatorname{S}_{\frac{\lambda\mR^2}{\rho}}(\vx^{(k+1)} - \frac{\mR\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vgamma^{(k + 1)} = \vgamma^{(k)} + \rho\mR^{-1}(\vz^{(k + 1)} - \vx^{(k + 1)})
+\end{equation}
+
+\begin{equation}
+\veta^{(k + 1)} = \veta^{(k)} + \rho(\vy^{(k + 1)} - \mD\vx^{(k + 1)})
+\end{equation}
+
+However, these equations will be simpler using slightly different updates.
+
+\begin{equation}
+\mR^{-1}\vx^{(k + 1)} = (\mId + (\mD\mR)^H(\mD\mR))^{-1}(\mR^{-1}\vz^{(k)} + \frac{\vgamma^{(k)}}{\rho} + (\mD\mR)^H\vy^{(k)} + \frac{(\mD\mR)^H\veta^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)}= \begin{cases}
+\frac{1}{1 + \rho}(\vs + \rho(\mD\mR\mR^{-1}\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho})) & \text{within signal domain}\\
+\mD\mR\mR^{-1}\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\mR^{-1}\vz^{(k + 1)}= \operatorname{S}_{\frac{\lambda\mR}{\rho}}(\mR^{-1}\vx^{(k+1)} - \frac{\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vgamma^{(k + 1)} = \vgamma^{(k)} + \rho(\mR^{-1}\vz^{(k + 1)} - \mR^{-1}\vx^{(k + 1)})
+\end{equation}
+
+\begin{equation}
+\veta^{(k + 1)} = \veta^{(k)} + \rho(\vy^{(k + 1)} - \mD\mR\mR^{-1}\vx^{(k + 1)})
+\end{equation}
+
+
+In the above equations, the dictionary never appears unscaled (without $\mR$), and the coefficients are always scaled by $\mR^{-1}$. Unfortunately,  $\mR$ still must be calculated for the $\vz$-update.
+
+For reference while coding, I would like to adjust into SPORCO package notation. I can add an $S$ subscript to prevent confusion.
+
+\begin{equation}
+\vx_S^{(k)} = \mR^{-1}\vx^{(k)}
+\end{equation}
+
+\begin{equation}
+\vy_S^{(k)} = \begin{bmatrix} \vy^{(k)} \\ \mR^{-1}\vz^{(k)} \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\vu_S^{(k)} = \begin{bmatrix} \veta^{(k)} \\ \vgamma^{(k)} \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mA_S = \begin{bmatrix} - \mD \\ -\mId \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mB_S = \begin{bmatrix} \mId & \vzero \\ \vzero & \mId \end{bmatrix} = \begin{bmatrix} \mP_0 & \mP_1 \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mC_S = \begin{bmatrix} \vzero \\ \vzero \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mQ_S = \mId + (\mD\mR)^H(\mD\mR)
+\end{equation}
+
+\begin{equation}
+\mD_S = \mD\mR
+\end{equation}
+
+
+
+\begin{equation}
+\vx_S^{(k + 1)} = \mQ_S^{-1}(\mP_1\vy_S^{(k)} + \frac{\mP_1\vu_S^{(k)}}{\rho} + \mD_S^H\mP_0\vy_S^{(k)} + \frac{\mD_S^H\mP_0\vu_S^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vy_S^{(k + 1)} = \begin{bmatrix}
+\begin{cases}
+\frac{1}{1 + \rho}(\vs + \rho(\mD_S\vx_S^{(k + 1)} - \frac{\mP_0\vu_S^{(k)}}{\rho})) & \text{within signal domain}\\
+\mD_S\vx_S^{(k + 1)} - \frac{\mP_0\vu_S^{(k)}}{\rho} & \text{outside signal domain}
+\end{cases} \\
+\operatorname{S}_{\frac{\lambda\mR}{\rho}}(\vx_S^{(k+1)} - \frac{\mP_1\vu_S^{(k)}}{\rho})
+
+\end{bmatrix}
+
+\end{equation}
+
+
+\begin{equation}
+\vu_S^{(k + 1)} = \vu_S^{(k)} + \rho(\mA_S\vx_S^{(k + 1)} + \mB_S\vy_S^{(k + 1)})
+\end{equation}
+
+\end{document}

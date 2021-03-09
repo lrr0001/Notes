@@ -1,0 +1,115 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+This is clever and all, but $\mB\mA$ has the same eigenvalues as $\mA\mB$, and if $\vy$ is an eigenvector of $\mB\mA$, then $\mA\vy$ is an eigenvector of $\mA\mB$. Much simpler methods exist to solve this problem. Still interested in the complicated way? Read on.
+
+
+\begin{equation}
+\vu\vv^H + \vv\vu^H = \lambda_1 \vx\vx^H + \lambda_2 \vy\vy^H
+\end{equation}
+
+Task:
+Given $\vu$ and $\vv$, find $\lambda_1$, $\lambda_2$, $\vx$, and $\vy$
+
+Let $\mA = \vu\vv^H + \vv\vu^H$
+
+\begin{equation}
+\mA\vu = (\vv^H\vu)\vu + (\vu^H\vu)\vv
+\end{equation}
+
+\begin{equation}
+\mA\vv = (\vv^H\vv)\vu + (\vu^H\vv)\vv
+\end{equation}
+
+\begin{equation}
+\mA^2\vu = (\vv^H\vu)((\vv^H\vu)\vu + (\vu^H\vu)\vv) + (\vu^H\vu)((\vv^H\vv)\vu + (\vu^H\vv)\vv)
+\end{equation}
+
+\begin{equation}
+\mA^2\vu = ((\vv^H\vu)(\vv^H\vu) + (\vu^H\vu)(\vv^H\vv))\vu + ((\vv^H\vu)(\vu^H\vu) + (\vu^H\vu)(\vu^H\vv))\vv
+\end{equation}
+
+\begin{equation}
+\mA^2\vu = ((\vv^H\vu)^2 + (\vu^H\vu)(\vv^H\vv))\vu + (2\Re{\vv^H\vu}(\vu^H\vu))\vv
+\end{equation}
+
+\begin{equation}
+\mA^2\vu = \begin{bmatrix} \vu & \mA\vu \end{bmatrix} \begin{bmatrix} -c \\ -b \end{bmatrix}
+\end{equation}
+
+Need to solve for $b$ and $c$.
+
+\begin{equation}
+\begin{bmatrix}
+\vu & \mA\vu
+\end{bmatrix} =
+\begin{bmatrix}
+\vu & \vv
+\end{bmatrix}
+\begin{bmatrix}
+1 & \vv^H\vu\\
+0 & \vu^H\vu
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\begin{bmatrix}
+\vu & \vv
+\end{bmatrix} =
+\begin{bmatrix}
+\vu & \mA\vu
+\end{bmatrix}
+\frac{1}{\vu^H\vu}
+\begin{bmatrix}
+\vu^H\vu & -\vv^H\vu\\
+0 & 1
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mA^2\vu = \begin{bmatrix} \vu & \vv \end{bmatrix} \begin{bmatrix} (\vv^H\vu)^2 + (\vu^H\vu)(\vv^H\vv) \\ 2\Re{\vv^H\vu}(\vu^H\vu) \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mA^2\vu = \begin{bmatrix}
+\vu & \mA\vu
+\end{bmatrix}
+\frac{1}{\vu^H\vu}
+\begin{bmatrix}
+\vu^H\vu & -\vv^H\vu\\
+0 & 1
+\end{bmatrix}
+\begin{bmatrix} (\vv^H\vu)^2 + (\vu^H\vu)(\vv^H\vv) \\ 2\Re{\vv^H\vu}(\vu^H\vu) \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\mA^2\vu = \begin{bmatrix}
+\vu & \mA\vu
+\end{bmatrix}
+\begin{bmatrix} (\vv^H\vu)^2 + (\vu^H\vu)(\vv^H\vv) - 2\Re{\vv^H\vu}\vv^H\vu \\ 2\Re{\vv^H\vu} \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\lambda^2 + b\lambda + c = 0
+\end{equation}
+
+\begin{equation}
+b = -2\Re{\vv^H\vu}
+\end{equation}
+
+\begin{equation}
+c = 2\Re{\vv^H\vu}\vv^H\vu - (\vu^H\vu)(\vv^H\vv) - (\vv^H\vu)^2
+\end{equation}
+
+\begin{equation}
+\lambda = \Re{\vv^H\vu} \pm \frac{1}{2}\sqrt{\Re{\vv^H\vu}^2 + 4( (\vv^H\vu)^2 + (\vu^H\vu)(\vv^H\vv) - 2\Re{\vv^H\vu}\vv^H\vu)}
+\end{equation}
+
+This is clever and all, but $\mB\mA$ has the same eigenvalues as $\mA\mB$, and if $\vy$ is an eigenvector of $\mB\mA$, then $\mA\vy$ is an eigenvector of $\mA\mB$.
+
+\end{document}

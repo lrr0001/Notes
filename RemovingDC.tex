@@ -1,0 +1,149 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+Consider the problem:
+\begin{equation}
+\min_{\vx} \frac{\mu}{2} \|\mW^T\mQ\mW\vx - \mW^T\mQ\mW\vs\|_2^2 + \frac{\lambda}{2}\sum_{i} \|\mG_i\vx\|_2^2 
+\end{equation}
+
+where $\mQ$ is a nonlinear quantization operator such that $\vy = \mQ\vx$ implies $\vy[i] = \vq[i]*\operatorname{round}(\frac{\vx[i]}{\vq[i]})$.
+
+I can rewrite this problem, splitting $\vx$ into two variables:
+\begin{equation}
+\begin{aligned}
+\arg\min_{\vx,\vz} & \frac{\mu}{2} \|\vz - \vx\|_2^2 + \frac{\lambda}{2}\sum_{i} \|\mG_i\vx\|_2^2 \\
+\text{subject to } & \mQ\mW\vz - \mQ\mW\vs = 0
+\end{aligned} 
+\end{equation}
+
+It would certainly be possible to swap the constraint and the first objective term, but I would like to minimize the number of update equations for which the nonlinear operator $\mQ$ complicates.
+
+The alternating directionn method of multipliers algorithm (ADMM) is designed for affine equality constrains, but $\mW^T\mQ\mW$ is close enough to linear that I expect it will succeed here despite the nonlinearity of quantization.
+
+\section{$\vx$ Update}
+
+
+
+
+\section{$\vz$ Update}
+\begin{equation}
+\vz^{(k + 1)} = \arg\min_{\vz} \frac{\mu}{2} \|\vz - \vx^{(k + 1)}\|_2^2 + \frac{\rho}{2}\|\mW^T\mQ\mW\vz + (1 - \alpha)\mW^T\mQ\mW\vz^{(k)} - (2 - \alpha)\mW^T\mQ\mW\vs + \frac{\vgamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+I should note here that due to the quantization, this minimizer is not guarenteed (or even likely) to exist.  However, the infimum does exist and a solution that evaluates arbitrarily close to that infimum can be found.  
+
+To solve this, I will start by ignoring the quantization and finding the assymptotic solution as $\vq$ approaches zero.
+\begin{equation}
+\vz^{(k + 1)} \approx \arg\min_{\vz} \frac{\mu}{2} \|\vz - \vx^{(k + 1)}\|_2^2 + \frac{\rho}{2}\|\mW^T\mW\vz + (1 - \alpha)\mW^T\mW\vz^{(k)} - (2 - \alpha)\mW^T\mW\vs + \frac{\vgamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+\begin{equation}
+(\mu\mId + \rho\mW^T\mW)\vz^{(k + 1)} \approx \mu\vx^{(k + 1)} + \rho\mW^T((2 - \alpha)\mW\vs - (1 - \alpha)\mW\vz^{(k)} - \frac{\vgamma}{\rho})
+\end{equation}
+
+\begin{equation}
+\mu\mId + \rho\mW^T\mW = \mu(\mId - \mW^T\mW) + (\mu + \rho)\mW^T\mW
+\end{equation}
+
+\begin{equation}
+(\mu\mId + \rho\mW^T\mW)^{-1} = \frac{1}{\mu}(\mId - \mW^T\mW) + \frac{1}{\mu + \rho}\mW^T\mW
+\end{equation}
+
+\begin{equation}
+(\mu\mId + \rho\mW^T\mW)^{-1} = \frac{1}{\mu}\mId - \frac{\rho}{\mu^2 + \rho\mu}\mW^T\mW
+\end{equation}
+
+\begin{equation}
+\vz^{(k + 1)} \approx \vx^{(k + 1)} - \frac{\rho}{\mu + \rho}\mW^T\mW\vx^{(k + 1)} + \frac{\rho}{\mu + \rho}\mW^T((2 - \alpha)\mW\vs - (1 - \alpha)\mW\vz^{(k)} - \frac{\vgamma}{\rho})
+\end{equation}
+
+\begin{equation}
+\vz^{(k + 1)} \approx \vx^{(k + 1)}  + \frac{\rho}{\mu + \rho}\mW^T((2 - \alpha)\mW\vs - \mW\vx^{(k + 1)} - (1 - \alpha)\mW\vz^{(k)} - \frac{\vgamma}{\rho})
+\end{equation}
+
+Now, I will reinsert $\mQ$ in the places it was removed. The result should still be fairly close to the actual solution.
+\begin{equation}
+\vz^{(k + 1)} \approx \vx^{(k + 1)}  + \frac{\rho}{\mu + \rho}\mW^T((2 - \alpha)\mQ\mW\vs - \mW\vx^{(k + 1)} - (1 - \alpha)\mQ\mW\vz^{(k)} - \frac{\vgamma}{\rho})
+\end{equation}
+
+In the interest of brevity, I will define:
+\begin{equation}
+\vr = (2 - \alpha)\mQ\mW\vs - \mW\vx^{(k + 1)} - (1 - \alpha)\mQ\mW\vz^{(k)} - \frac{\vgamma}{\rho}
+\end{equation}
+
+\begin{equation}
+\vz_{\text{approx}}^{(k + 1)} = \vx^{(k + 1)} + \frac{\rho}{\mu + \rho}\mW^T\vr
+\end{equation}
+
+Plugging the $\vz = \vz_{\text{approx}}^{(k + 1)} + \Delta\vz$ into the function to be minimized, I have the expression:
+\begin{equation}
+\frac{\mu}{2} \|\frac{\rho}{\mu + \rho}\mW^T\vr + \Delta\vz\|_2^2 + \frac{\rho}{2}\|\mQ\mW(\vx^{(k + 1)} + \frac{\rho}{\mu + \rho}\mW^T\vr + \Delta\vz) - (2 - \alpha)\mQ\mW\vs + (1 - \alpha)\mQ\mW\vz^{(k)} + \frac{\vgamma^{(k)}}{\rho}\|_2^2
+\end{equation}
+
+
+\begin{equation}
+\frac{\mu}{2} \|\frac{\rho}{\mu + \rho}\mW^T\vr + \Delta\vz\|_2^2 + \frac{\rho}{2}\|\mQ\mW(\vx^{(k + 1)} + \frac{\rho}{\mu + \rho}\mW^T\vr + \Delta\vz) - \vr - \mW\vx^{(k + 1)}\|_2^2
+\end{equation}
+
+\begin{equation}
+\mW\mW^T = \mId
+\end{equation}
+
+\begin{equation}
+\frac{\mu}{2} \|\frac{\rho}{\mu + \rho}\mW^T\vr + \Delta\vz\|_2^2 + \frac{\rho}{2}\|\mQ(\mW\vx^{(k + 1)} + \frac{\rho}{\mu + \rho}\vr + \mW\Delta\vz) - \vr - \mW\vx^{(k + 1)}\|_2^2
+\end{equation}
+
+Any component of $\Delta\vz$ that is orthogonal to $\mW$ will increase the first term of the objective expression and leave the second term unchanged. Therefore, the optimal choice of $\Delta\vz$ has no component orthogonal to $\mW$.
+
+So, I can minimize this expression instead:
+
+\begin{equation}
+\frac{\mu}{2} \|\frac{\rho}{\mu + \rho}\vr + \mW\Delta\vz\|_2^2 + \frac{\rho}{2}\|\mQ(\mW\vx^{(k + 1)} + \frac{\rho}{\mu + \rho}\vr + \mW\Delta\vz) - \vr - \mW\vx^{(k + 1)}\|_2^2
+\end{equation}
+
+Finally, again for convenience, define
+
+\begin{equation}
+\vy = \mW\vx^{(k + 1)} + \frac{\rho}{\mu + \rho}\vr
+\end{equation}
+
+So, I have
+\begin{equation}
+\frac{\mu}{2} \|\frac{\rho}{\mu + \rho}\vr + \mW\Delta\vz\|_2^2 + \frac{\rho}{2}\|-\frac{\mu}{\mu + \rho}\vr + \mQ(\vy + \mW\Delta\vz) - \vy\|_2^2
+\end{equation}
+
+
+It is convenient that when trying to minimize the expression, each element of $\mW\Delta\vz$ can be treated independently.
+
+In comparison to $\mW\Delta\vz = 0$, it is possible to decrease the first objective term while not changing the second objective term by adjusting $\mW\Delta\vz$ in the direction $-\vr$.
+
+\begin{equation}
+\mW\Delta\vz[i] = -\operatorname{sign}(\vr[i])\operatorname{minimum}(|\frac{\rho}{\mu + \rho}\vr[i]|,|\vq[i]*\operatorname{round}(\frac{\vy[i]}{\vq[i]}) - 0.5^{-}\vq[i]\operatorname{sign}(\vr[i]) - \vy[i]|
+\end{equation}
+where $0.5^{-}$ is a number less than $0.5$, but arbitarily close to it.
+
+In comparison to $\mW\Delta\vz = 0$, it may be possible to decrease the second term by using $\mW\Delta\vz$ to switch the rounding direction.
+\begin{equation}
+\mW\Delta\vz[i] = \vq[i]*\operatorname{round}(\frac{\vy[i]}{\vq[i]}) - 0.5^{+}\vq[i]\operatorname{sign}(\vy[i] - \vq[i]*\operatorname{round}(\frac{\vy[i]}{\vq[i]}) - \frac{\rho}{\mu + \rho}\vr[i]) - \vy[i]
+\end{equation}
+
+Finally, in comparison to $\mW\Delta\vz = 0$, it may be possible to decrease the first objective term while switching the rounding direction.
+\begin{equation}
+\mW\Delta\vz[i] = -\operatorname{sign}(\vr[i])\operatorname{minimum}(|\frac{\rho}{\mu + \rho}\vr[i]|,|\vq[i]*\operatorname{round}(\frac{\vy[i]}{\vq[i]}) - 1.5^{-}\vq[i]\operatorname{sign}(\vr[i]) - \vy[i]|
+\end{equation}
+By comparing these three possible minimizers\footnote{Again, I should clarify, not an actual minimizer, but something that evaluates arbitarily close to the infimum.}, I can identify the minimizer, and adjust the $\vz_{\text{approx}}^{(k + 1)}$ accordingly.
+\begin{equation}
+\vz^{(k + 1)} = \vz_{\text{approx}}^{(k + 1)} + \Delta\vz
+\end{equation}
+
+\section{$\vgamma$ update}
+
+\begin{equation}
+\frac{\vgamma^{(k + 1)}}{\rho} = \frac{\vgamma^{(k)}}{\rho} + \mQ\mW\vz^{(k + 1)} + (1 - \alpha)\mQ\mW\vz^{(k)} - (2 - \alpha)\mQ\mW\vs 
+\end{equation}
+
+\end{document}

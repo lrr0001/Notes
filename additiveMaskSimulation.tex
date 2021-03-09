@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+Wohlberg suggests two approaches to boundary handling.
+
+Additive mask simulation is a boundary-handling approach that adds impulse filters for each channel to the dictionary.  The support of the corresponding coefficients are constrained to the boundary of the signal (and also to locations in which data is imcomplete).
+
+Wohlberg does this explictly in his code, but this can be computed implicitly. Doing so adds 1 to the scaling of the identity matrix, a term in the matrix for the inverse problem.
+
+\begin{equation}
+\begin{bmatrix}
+\rho \mId + \mD^H\mD & \mD^H \\
+\mD & (\rho + 1)\mId
+\end{bmatrix}
+\begin{bmatrix}
+\vx_1 \\
+\vx_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+\vb_1 \\
+\vb_2
+\end{bmatrix}
+\end{equation}
+
+where $\vx_2$ is the coefficients for the impulse filters.
+
+Using elimination:
+
+\begin{equation}
+\begin{bmatrix}
+\rho \mId + \frac{\rho}{\rho + 1}\mD^H\mD & \vzero \\
+\mD & (\rho + 1)\mId
+\end{bmatrix}
+\begin{bmatrix}
+\vx_1 \\
+\vx_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+\vb_1 - \frac{1}{1 + \rho}\mD^H\vb_2 \\
+\vb_2
+\end{bmatrix}
+\end{equation}
+
+Therefore,
+
+\begin{equation}
+\vx_1 = \frac{\rho}{\rho + 1}((\rho + 1)\mId + \mD^H\mD)^{-1}(\vb_1 -\frac{1}{\rho + 1}\mD^H\vb_2
+\end{equation}
+\begin{equation}
+\vx_2 = \vb_2 - \mD\vx_1
+\end{equation}
+
+This approach is compatible with rescaling to accomodate unscaled dictionaries.  (The rescaling does not affect the impulse filters.) If a different inverse matrix is necessary to match earlier computations, the scaling of the coefficient constraints can be adjusted.
+
+For example:
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx,\vz} & \frac{1}{2}\|\vs - \mD\vx\|_2^2 + \lambda \|\valpha \cdot \vz \|_1 \\
+\text{subject to} & \sqrt{\beta} \mR^{-1}(\vz - \vx) = 0
+\end{aligned}
+\end{equation}
+
+Using additive mask simulation:
+
+\begin{equation}
+\mR_1^{-1}\vx_1^{(k + 1)} = ((\beta\rho + 1)\mId + \mD^H\mD)^{-1}
+\end{equation}
+
+\end{document}

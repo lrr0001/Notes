@@ -1,0 +1,48 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+My approach is to use low-rank updates to a factorization of
+
+\begin{equation}
+\rho\mId + \mD^H\mD
+\end{equation}
+
+for inverse computations. Alternatively, the form
+
+\begin{equation}
+\rho\mId + \mD\mD^H
+\end{equation}
+
+can be used exploiting Woodbury Matrix Lemma.
+
+The low-rank update takes the form:
+
+\begin{equation}
+\mD_{k+1} = \mD_k + \vu\vv^H
+\end{equation}
+
+The low-rank update produces the following equation.
+
+\begin{equation}
+\rho\mId + (\mD + \vu\vv^H)^H(\mD + \vu\vv^H) = \rho\mId + \mD^H\mD + \vu^H\vu \vv\vv^H + \vv\vu^H\mD + \mD^H\vu\vv^H
+\end{equation}
+
+The expression
+\begin{equation}
+\vv\vu^H\mD + \mD^H\vu\vv
+\end{equation}
+
+produces a Hermitian matrix, so eigenvalues are real and eigenvectors can be chosen to be orthogonal, but there is no guarentee of positive definiteness. Negative eigenvalues aren't even rare.
+
+However, given the original form:
+\begin{equation}
+\rho\mId + (\mD + \vu\vv^H)^H(\mD + \vu\vv^H) 
+\end{equation}
+
+it is obvious the system is positive definite. Therfore, we should be careful to compute the downdates last, and make sure the update algorithm can handle downdates without undermining stability.
+\end{document}

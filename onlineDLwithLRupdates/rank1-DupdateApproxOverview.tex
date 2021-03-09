@@ -1,0 +1,135 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+\section{Brief Overview of Problem}
+
+Suppose we have an unconstrained freqency update $\mB$.
+
+\begin{equation}
+\hat{\mB} = \begin{bmatrix} \mB_{1,1} & \hdots & \mB_{1,K} \\
+                            \vdots    & \ddots & \vdots    \\
+                            \mB_{C,1} & \hdots & \mB_{C,K}
+                   \end{bmatrix}
+\end{equation}
+
+where all $\mB_{c, k}$ are diagonal.
+
+We want a similar but constrained frequency update $\Delta \hat{\mD}$:
+
+\begin{equation}
+\Delta \hat{\mD} = \begin{bmatrix} \Delta \hat{\mD}_{1,1} & \hdots & \Delta \hat{\mD}_{1,K}\\
+                                   \vdots & \ddots & \vdots \\
+                                   \Delta \hat{\mD}_{C,1} & \hdots & \Delta \hat{\mD}_{C,K}
+                   \end{bmatrix}
+\end{equation}
+
+
+where all $\Delta \hat{\mD}_{c, k}$ are diagonal and some additional constraints are met.
+
+Let $\Delta \hat{\mD}_{c, k}[\ell]$ be the $\ell$th diagonal element of $\Delta \hat{\mD}_{c,k}$ (in other words, the $\ell$th frequency component of the $c$th channel of the $k$th dictionary).
+
+Let
+
+
+\begin{equation}
+\Delta \hat{\mD}[\ell] = \begin{bmatrix}
+                                   \Delta \hat{\mD}_{1,1}[\ell] & \hdots & \Delta \hat{\mD}_{1,K}[\ell] \\
+                                              \vdots            & \ddots &           \vdots             \\
+                                   \Delta \hat{\mD}_{C,1}[\ell] & \hdots & \Delta \hat{\mD}_{C,K}[\ell]
+                         \end{bmatrix}
+\end{equation}
+
+We want $\Delta \hat{\mD}[\ell]$ to be low rank for all $\ell$.
+
+We also want $\Delta \hat{\mD}_{c,k}$ to have local and small spatial support (This is an affine constraint.).
+
+\section{Proposed Solution}
+
+Currently, we have $CK$ low-rank constraints. Let's work with a single, rank-one constraint.
+
+We can choose from the following:
+
+\begin{enumerate}
+
+\item
+\begin{equation}
+\begin{matrix}
+\operatorname{rank}(\begin{bmatrix} \Delta \hat{\mD}[0] & \hdots & \Delta \hat{\mD}[L - 1] \end{bmatrix}) = 1
+\end{matrix}
+\end{equation}
+
+Or
+\item
+\begin{equation}
+\begin{matrix}
+\operatorname{rank} \left (\begin{bmatrix} \Delta \hat{\mD}[0] \\
+                                    \vdots \\
+                                    \Delta \hat{\mD}[L - 1] \end{bmatrix} \right ) = 1
+\end{matrix}
+\end{equation}
+
+\end{enumerate}
+
+Either of these options is sufficient to ensure that the rank-one constraints from the original problem are met.
+
+Now, using either of these options, we can apply the affine projection first, and then apply low-rank constraint, and the result should meet both constraints.
+
+If we want to work with a higher rank, we can solve for a rank-one approximation, subtract it off, and then solve for a second rank-one approximation. I suspect any rank higher than two wouldn't be worth the effort, but rank $2$ might be worthwhile, since we could use both low-rank options.
+
+To summarize:
+
+\begin{equation}
+\begin{aligned}
+\min_{\Delta \hat{\mD}} & \|\begin{bmatrix} \mB[0] & \hdots & \mB[L - 1] \end{bmatrix} - \begin{bmatrix} \Delta \hat{\mD}[0] & \hdots \Delta \hat{\mD}[L - 1] \end{bmatrix}\|_F^2 \\
+\text{ subject to } & \operatorname{rank}(\begin{bmatrix} \Delta \hat{\mD}[0] & \hdots & \Delta \hat{\mD}[L - 1] \end{bmatrix}) = 1 \\
+                    & (\mId - \mP)\mathcal{F}^{-1}(\Delta \hat{\mD}_{c,k}) = \vzero
+\end{aligned}
+\end{equation}
+
+where $\mP$ selects the desired spatial support of the filter. 
+
+
+\section{Additional Discussion}
+
+So, there are a couple pieces missing here. One is normalization. Normalizing the update would be easy. Unfortunately, that's not what we want. What we want is a normalized dictionary. Perhaps we can track normalization separately from the dictionary itself?  That is, if we keep track of the norm of the atoms, we can just divide the corresponding coefficients by that number. Or we could somehow rescale the update and the dictionary to get a normalized result?
+
+Regardless, I think if we can solve everything else, we should be able to come up with some way to handle the normalization problem.
+
+I want to address the more glaring issue: replacing the many rank-one constraints with a single, larger, rank-one constraint may be pretty far from optimal. However, I suspect the approximation may actually be very close, if not optimal.
+
+Consider a simplified problem with similar properties. Let's keep things rank $1$, and keep all of our channels and filters. Suppose we replace the affine constraint with a simpler restriction: we require the diagonals of the submatrices to be in the span of a set of two vectors:
+
+\begin{equation}
+f_1 = \begin{bmatrix} 1 \\
+                      0 \\
+                      1
+      \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+f_2 = \begin{bmatrix} 0 \\
+                      1 \\
+                      -1
+      \end{bmatrix}
+\end{equation}
+
+Then, our problem simplifies to the following:
+
+\begin{equation}
+\begin{aligned}
+\min_{\mD} & \|\mB[0] - \Delta \hat{\mD}[0]\|_F^2 + \|\mB[1] - \Delta \hat{\mD}[1]\|_F^2 + \|\mB[2] - (\Delta \hat{\mD}[0] - \Delta \hat{\mD}[1])\|_F^2  \\
+\text{ subject to } & \operatorname{rank}(\Delta \hat{\mD}[0]) = 1 \\
+& \operatorname{rank}(\Delta \hat{\mD}[1]) = 1 \\
+& \operatorname{rank}(\Delta \hat{\mD}[0] - \Delta \hat{\mD}[1]) = 1
+\end{aligned}
+\end{equation}
+
+In this case, my approach will yield the optimal solution. (I convinced myself looking at a simple $4 \times 4$ case with some illustrations and contemplating similar triangles.)
+
+How good is this approximation under more complicated conditions?  I'm not sure.  I wouldn't be surprised if it's optimal there too, but it's easier to conjecture than to prove.
+
+\end{document}

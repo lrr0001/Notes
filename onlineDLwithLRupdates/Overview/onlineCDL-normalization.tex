@@ -1,0 +1,91 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+
+Consider the optimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx,\vz} & \frac{1}{2}\|\vs - \mD\vx\|_2^2 + \lambda\|\vz\|_1 \\
+\text{subject to } & \vz - \vx = 0
+\end{aligned}
+\end{equation}
+
+The Lagrangian function has a saddlepoint at the solution.
+
+In traditional ADMM, the Lagrangian function
+
+\begin{equation}
+\operatorname{L}(\vx,\vz,\vgamma) = \frac{1}{2}\|\vs - \mD\vx\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H(\vz - \vx)
+\end{equation}
+
+is augmented with a term $\frac{1}{\rho}\|\vz - \vx\|_2^2$. This added term does not change the saddlepoint solution; for all feasible points, the added term is zero. It's purpose is to make finding the saddlepoint easier. The resulting function is known as the augmented Lagrangian.
+
+\begin{equation}
+\operatorname{L}_{\rho}(\vx,\vz,\vgamma) = \frac{1}{2}\|\vs - \mD\vx\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H(\vz - \vx) + \frac{1}{\rho}\|\vz - \vx\|_2^2  
+\end{equation}
+
+Now, instead of augmenting the lagrangian with the traditional term 
+$\frac{\rho}{2}\|\vz - \vx\|_2^2$, consider an alternative term $\frac{1}{2}\|\mLambda^{\frac{1}{2}}(\vz - \vx)\|_2^2$ where $\mLambda$ is a diagonal positive definite matrix.
+
+Then,
+
+
+\begin{equation}
+\operatorname{L}_{\mLambda}(\vx,\vz,\vgamma) = \frac{1}{2}\|\vs - \mD\vx\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H(\vz - \vx) + \frac{1}{2}\|\mLambda^{\frac{1}{2}}(\vz - \vx)\|_2^2  
+\end{equation}
+
+
+
+\begin{equation}
+\nabla_{\vx} \operatorname{L}_{\mLambda}(\vx,\vz,\vgamma) = \mD^H\mD\vx - \mD^H\vs + \mLambda\vx - \mLambda\vz - \vgamma
+\end{equation}
+
+So,
+
+\begin{equation}
+\arg\min_{\vx} \operatorname{L}_{\mLambda}(\vx,\vz,\vgamma) = (\mLambda + \mD^H\mD)^{-1}(\mD^H\vs - \mLambda\vz - \vgamma)
+\end{equation}
+
+and
+
+\begin{equation}
+\arg\min_{\vz} \operatorname{L}_{\mLambda}(\vx,\vz,\vgamma) = \operatorname{S}_{\lambda\mLambda^{-1}}(\vx - \mLambda^{-1}\vgamma)
+\end{equation}
+
+Therefore, we get the following ADMM iterative update equations:
+
+
+\begin{equation}
+\vx^{(k + 1)} = (\mLambda + \mD^H\mD)^{-1}(\mD^H\vs - \mLambda\vz^{(k)} - \vgamma^{(k)})
+\end{equation}
+
+\begin{equation}
+\vz^{(k + 1)} = \operatorname{S}_{\lambda\mLambda^{-1}}(\vx^{(k + 1)} - \mLambda^{-1}\vgamma^{(k)})
+\end{equation}
+
+\begin{equation}
+\vgamma{(k + 1)} = \vgamma^{(k)} + \mLambda(\vz^{(k + 1)} - \vx^{(k + 1)})
+\end{equation}
+
+
+Note that
+
+\begin{equation}
+(\mLambda + \mD^H\mD)^{-1} = \mLambda^{-\frac{1}{2}}(\mId + \mLambda^{-\frac{1}{2}}\mD^H\mD\mLambda^{-\frac{1}{2}})^{-1}\mLambda^{-\frac{1}{2}}
+\end{equation}
+
+Using a standard approach, low-rank updates and normalized dictionaries are incompatible. However, with the above modification, the scaling factors (to accomodate the low-rank updates) can be represented in the $\mLambda$ matrix, leaving the dictionary $\mD$ appropriately normalized.
+
+This allows the individual rescaling of filters, but not channels, so individual channels will not be normalized.
+
+The same approach can also be applied in the context of mask decoupling and/or $\ell$-1 data fidelity.
+
+
+
+\end{document}

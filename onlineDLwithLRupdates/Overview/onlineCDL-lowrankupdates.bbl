@@ -1,0 +1,45 @@
+\begin{thebibliography}{1}
+
+\bibitem{wohlberg2016boundary}
+B.~{Wohlberg}, ``Boundary handling for convolutional sparse representations,''
+  in {\em 2016 IEEE International Conference on Image Processing (ICIP)},
+  pp.~1833--1837, Sep. 2016.
+
+\bibitem{boyd2011distributed}
+S.~Boyd, N.~Parikh, E.~Chu, B.~Peleato, J.~Eckstein, {\em et~al.},
+  ``Distributed optimization and statistical learning via the alternating
+  direction method of multipliers,'' {\em Foundations and
+  Trends{\textregistered} in Machine learning}, vol.~3, no.~1, pp.~1--122,
+  2011.
+
+\bibitem{bristow2013fast}
+H.~Bristow, A.~Eriksson, and S.~Lucey, ``Fast convolutional sparse coding,'' in
+  {\em Proceedings of the IEEE Conference on Computer Vision and Pattern
+  Recognition}, pp.~391--398, 2013.
+
+\bibitem{heide2015fast}
+F.~Heide, W.~Heidrich, and G.~Wetzstein, ``Fast and flexible convolutional
+  sparse coding,'' in {\em Proceedings of the IEEE Conference on Computer
+  Vision and Pattern Recognition}, pp.~5135--5143, 2015.
+
+\bibitem{vsorel2016fast}
+M.~{\v{S}}orel and F.~{\v{S}}roubek, ``Fast convolutional sparse coding using
+  matrix inversion lemma,'' {\em Digital Signal Processing}, vol.~55,
+  pp.~44--51, 2016.
+
+\bibitem{garcia2018convolutional}
+C.~Garcia-Cardona and B.~Wohlberg, ``Convolutional dictionary learning: A
+  comparative review and new algorithms,'' {\em IEEE Transactions on
+  Computational Imaging}, vol.~4, no.~3, pp.~366--381, 2018.
+
+\bibitem{beck2009fast}
+A.~Beck and M.~Teboulle, ``A fast iterative shrinkage-thresholding algorithm
+  for linear inverse problems,'' {\em SIAM journal on imaging sciences},
+  vol.~2, no.~1, pp.~183--202, 2009.
+
+\bibitem{liu2018first}
+J.~Liu, C.~Garcia-Cardona, B.~Wohlberg, and W.~Yin, ``First-and second-order
+  methods for online convolutional dictionary learning,'' {\em SIAM Journal on
+  Imaging Sciences}, vol.~11, no.~2, pp.~1589--1628, 2018.
+
+\end{thebibliography}

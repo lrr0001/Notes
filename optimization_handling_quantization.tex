@@ -1,0 +1,219 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+This is the problem I'm trying to solve:
+
+\begin{equation}
+f(\vz) =  \frac{a}{2}\|\vz - \vx\|_2^2 + \frac{b}{2}\|\mP\vz - \mP\vs\|_2^2
+\end{equation}
+
+\begin{equation}
+\arg\min_{\vz} f(\vz)
+\end{equation}
+
+where $\mP$ is a nonlinear operator, specifically a quantized projection operator.
+
+That is, $\mP(\cdot) = \mW^T\operatorname{Quantize}(\mW\cdot)$, where $\mW^T\mW$ is a projection operator.
+
+\begin{equation}
+\operatorname{Quantize}(\vy) = \operatorname{round}(\frac{\vy}{\vq})*\vq
+\end{equation}
+(Division here is element-by-element).
+
+In an early attempt to solve my problem, I pretended $\mP$ was a linear projection operator and came up with an approximate solution to my original problem.
+
+\begin{equation}
+\vz_{\text{approx}} = \vx + \frac{b}{a + b}(\mP\vs - \mP\vx)
+\end{equation}
+
+Now, plugging $\vz = \vz_{\text{approx}} + \Delta\vz$ back into the original equation, I have the expression:
+\begin{equation}
+f(\vz_{\text{approx}} + \Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vx) + \Delta\vz\|_2^2 + \frac{b}{2}\|\mP(\vx + \frac{b}{a + b}(\mP\vs - \mP\vx) + \Delta\vz) - \mP\vs\|_2^2
+\end{equation}
+
+
+In analyzing this expression, I have found it helpful to define a function $\vepsilon(\Delta\vz)$:
+\begin{equation}
+\vepsilon(\Delta\vz) = \mP(\vx + \frac{b}{a + b}(\mP\vs - \mP\vx) + \Delta\vz) - \mP\vx - \frac{b}{a + b}(\mP\vs - \mP\vx)
+\end{equation}
+
+\begin{equation}
+\mP(\vx + \frac{b}{a + b}(\mP\vs - \mP\vx) + \Delta\vz) = \mP\vx - \frac{b}{a + b}(\mP\vs - \mP\vx) +\vepsilon(\Delta\vz)
+\end{equation}
+
+Returning to the objective function:
+\begin{equation}
+f(\vz_{\text{approx}} + \Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vx) + \Delta\vz\|_2^2 + \frac{b}{2}\|\mP\vx - \frac{b}{a + b}(\mP\vs - \mP\vx) +\vepsilon(\Delta\vz) - \mP\vs\|_2^2
+\end{equation}
+
+Simplifying
+\begin{equation}
+f(\vz_{\text{approx}} + \Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vx) + \Delta\vz\|_2^2 + \frac{b}{2}\|-\frac{a + b}{a + b}(\mP\vs - \mP\vx) + \frac{b}{a + b}(\mP\vs - \mP\vx) +\vepsilon(\Delta\vz)\|_2^2
+\end{equation}
+
+\begin{equation}
+f(\vz_{\text{approx}} + \Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vx) + \Delta\vz\|_2^2 + \frac{b}{2}\|- \frac{a}{a + b}(\mP\vs - \mP\vx) +\vepsilon(\Delta\vz)\|_2^2
+\end{equation}
+
+I have $2$ objective terms, and it will help to give them names:
+\begin{equation}
+f_1(\Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}(\mP\vs - \mP\vx) + \Delta\vz\|_2^2
+\end{equation}
+
+\begin{equation}
+f_2(\Delta\vz) = \frac{b}{2}\|- \frac{a}{a + b}(\mP\vs - \mP\vx) +\vepsilon(\Delta\vz)\|_2^2
+\end{equation}
+
+\begin{equation}
+f(\vz) = f_1(\vz - \vz_{\text{approx}}) + f_2(\vz - \vz_{\text{approx}})
+\end{equation}
+
+Now for some observations:
+\begin{enumerate}
+\item
+Adding a component to $\Delta\vz$ that is orthogonal to the span of the columns of $\mW^T$ increases the first term of the objective $f_1$ without affecting the second term $f_2$.
+\begin{equation}
+f_1(\Delta\vz) \geq f_1(\mW^T\mW\Delta\vz)
+\end{equation}
+
+\begin{equation}
+f_2(\Delta\vz) = f_2(\mW^T\mW\Delta\vz)
+\end{equation}
+
+Therefore,
+\begin{equation}
+(\mId - \mW^T\mW)(\Delta\vz)_{\text{optimal}} = 0
+\end{equation}
+
+\item
+In the simplified case of no quantization $\mP = \mW^T\mW$:
+\begin{equation}
+\vepsilon(\Delta\vz) = \mW^T\mW\Delta\vz
+\end{equation}
+
+And so, if the quantization process is removed,
+\begin{equation}
+(\Delta\vz)_{\text{optimal}} = 0
+\end{equation}
+
+\item
+For $\alpha \in [0,1]$:
+\begin{equation}
+f_2(\alpha\vepsilon(0)) = f_2(0)
+\end{equation}
+
+Furthermore, this is true even if I scale elements of $\mW\vepsilon(0)$ individually:
+For $\alpha_i \in [0,1]$:
+\begin{equation}
+f_2(\mW^T\operatorname{diag}(\valpha)\mW\vepsilon(0)) = f_2(0)
+\end{equation}
+
+\item
+There are certain choices for $\valpha$ from the previous observation that will decrease the first objective term $f_1$:
+
+\begin{equation}
+\alpha_i = \begin{cases} 1 & \operatorname{sign}(\ve_i^T\mW\vepsilon(0)) = -\operatorname{sign}(\ve_i^T\mW(\mP\vs - \mP\vx)) \\
+                         0 & \text{otherwise}
+           \end{cases}
+\end{equation}
+Using the $\valpha$ defined above:
+\begin{equation}
+f_1(\mW^T\operatorname{diag}(\valpha)\mW\vepsilon(0)) \leq f_1(0)
+\end{equation}
+
+\item
+The last couple of operations have focused on decreasing $f_1$ without affecting $f_2$. Here, I observe it is also possible to select a $\Delta\vz$ that deceases $f_2$ by more than it decreases $f_1$.
+
+\begin{equation}
+\beta_i = \begin{cases} 1 + \nu  & \operatorname{sign}(\ve_i^T\mW\vepsilon(\vq/2)) = \operatorname{sign}(\ve_i^T\mW(\mP\vs - \mP\vx)) \neq 0 \\
+                         0 & \text{otherwise}
+           \end{cases}
+\end{equation}
+where $\nu$ is an arbitrarily small number to ensure the rounding occurs in the proper direction.
+
+Using the $\vbeta$ defined above:
+\begin{equation}
+f_1(\mW^T\operatorname{diag}(\vbeta)\mW\vepsilon(\frac{\mW^T\vq}{2})) - f_1(0) \leq f_2(0) - f_2(\mW^T\operatorname{diag}(\vbeta)\mW\vepsilon(\frac{\mW^T\vq}{2}))
+\end{equation}
+
+\item
+Finally, the last couple observations can be combined for the optimal solution:
+\begin{equation}
+(\Delta\vz)_{\text{optimal}} = \mW^T\operatorname{diag}(\vbeta)\mW\vepsilon(\frac{\mW^T\vq}{2}) + \mW^T\operatorname{diag}(\valpha)\mW\vepsilon(0)
+\end{equation}
+
+where
+
+\begin{equation}
+\alpha_i = \begin{cases} 1 & \operatorname{sign}(\ve_i^T\mW\vepsilon(0)) = -\operatorname{sign}(\ve_i^T\mW(\mP\vs - \mP\vx)) \\
+                         0 & \text{otherwise}
+           \end{cases}
+\end{equation}
+
+\begin{equation}
+\beta_i = \begin{cases} 1 + \nu  & \operatorname{sign}(\ve_i^T\mW\vepsilon(\vq/2)) = \operatorname{sign}(\ve_i^T\mW(\mP\vs - \mP\vx)) \neq 0 \\
+                        0 & \text{otherwise}
+          \end{cases}
+\end{equation}
+\begin{equation}
+\vz_{\text{optimal}} = \vx + \frac{b}{a + b}(\mP\vs - \mP\vx) + \mW^T\operatorname{diag}(\vbeta)\mW\vepsilon(\frac{\mW^T\vq}{2}) + \mW^T\operatorname{diag}(\valpha)\mW\vepsilon(0)
+\end{equation}
+
+\end{enumerate}
+
+
+I still need to solve a slight variation of the above problem. Hopefully, the solution can be found in a similar way.
+
+\begin{equation}
+f(\vz) =  \frac{a}{2}\|\vz - \vx\|_2^2 + \frac{b}{2}\|\mP\vz + (1 - \mu)\mP\vy - (2 - \mu)\mP\vs\|_2^2
+\end{equation}
+
+\begin{equation}
+\arg\min_{\vz} f(\vz)
+\end{equation}
+
+\begin{equation}
+\vz_{\text{approx}} = \vx + \frac{b}{a + b}((2 - \mu)\mP\vs - (1 - \mu)\mP\vy - \mP\vx)
+\end{equation}
+
+To prevent derivations from falling off the page:
+\begin{equation}
+\vr = (2 - \mu)\mP\vs - (1 - \mu)\mP\vy - \mP\vx
+\end{equation}
+
+
+\begin{equation}
+f(\vz_{\text{approx}} + \Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}\vr + \Delta\vz\|_2^2 + \frac{b}{2}\|\mP(\vx + \frac{b}{a + b}\vr + \Delta\vz) + (1 - \mu)\mP\vy - (2 - \mu)\mP\vs\|_2^2
+\end{equation}
+
+\begin{equation}
+\vepsilon(\Delta\vz) = \mP(\vx + \frac{b}{a + b}((2 - \mu)\mP\vs - (1 - \mu)\mP\vy - \mP\vx) + \Delta\vz) - \mP\vx - \frac{b}{a + b}((2 - \mu)\mP\vs - (1 - \mu)\mP\vy - \mP\vx)
+\end{equation}
+
+\begin{equation}
+\vepsilon(\Delta\vz) = \mP(\vx + \frac{b}{a + b}\vr + \Delta\vz) - \mP\vx - \frac{b}{a + b}\vr
+\end{equation}
+
+\begin{equation}
+\mP(\vx + \frac{b}{a + b}\vr + \Delta\vz) = \mP\vx + \frac{b}{a + b}\vr  + \vepsilon(\Delta\vz)
+\end{equation}
+
+\begin{equation}
+f(\vz_{\text{approx}} + \Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}\vr + \Delta\vz\|_2^2 + \frac{b}{2}\|\mP\vx + \frac{b}{a + b}\vr  + \vepsilon(\Delta\vz) + (1 - \mu)\mP\vy - (2 - \mu)\mP\vs\|_2^2
+\end{equation}
+
+\begin{equation}
+f(\vz_{\text{approx}} + \Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}\vr + \Delta\vz\|_2^2 + \frac{b}{2}\|-\vr + \frac{b}{a + b}\vr  + \vepsilon(\Delta\vz)\|_2^2
+\end{equation}
+
+\begin{equation}
+f(\vz_{\text{approx}} + \Delta\vz) = \frac{a}{2}\|\frac{b}{a + b}\vr + \Delta\vz\|_2^2 + \frac{b}{2}\| -\frac{a}{a + b}\vr  + \vepsilon(\Delta\vz)\|_2^2
+\end{equation}
+
+The important distinction here is that $\mu$ prevents $\vr$ from being quantized by $\mP$'s quantization.  So, rounding in the "right direction" could go too far. 
+
+\end{document}

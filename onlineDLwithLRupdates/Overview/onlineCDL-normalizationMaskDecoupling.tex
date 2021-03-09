@@ -1,0 +1,169 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+Consider the optimization problem:
+
+\begin{equation}
+\begin{aligned}
+\min_{\vx,\vy,\vz} & \frac{1}{2}\|\vs - \mW\vy\|_2^2 + \lambda\|\vz\|_1 \\
+\text{subject to } & \vz - \vx = 0 \\
+                   & \vy -\mD\vx = 0
+\end{aligned}
+\end{equation}
+
+This optimization problem has the Lagrangian function:
+
+\begin{equation}
+\operatorname{L}(\vx,\vy,\vz,\vgamma,\veta) \frac{1}{2}\|\vs - \mW\vy\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H(\vz - \vx) + \veta^H(\vy - \mD\vx)
+\end{equation}
+
+Now, we can augment the Lagrangian. I will use the modification from the normalization document in my notes for one of the augmentation terms.
+
+\begin{equation}
+\operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = \frac{1}{2}\|\vs - \mW\vy\|_2^2 + \lambda\|\vz\|_1 + \vgamma^H(\vz - \vx) + \veta^H(\vy - \mD\vx) + \frac{\rho}{2}\|\mLambda^{\frac{1}{2}}(\vz - \vx)\|_2^2 + \frac{\rho}{2}\|\vy - \mD\vx\|_2^2
+\end{equation}
+
+\begin{equation}
+\nabla_{\vx}\operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = -\vgamma - \mD^H\veta + \rho\mLambda\vx - \rho\mLambda\vz + \rho\mD^H\mD\vx - \rho\mD^H\vy
+\end{equation}
+
+\begin{equation}
+\min_{\vx} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = (\rho\mLambda + \rho\mD^H\mD)^{-1}(\rho\mD^H(\vy + \frac{\veta}{\rho}) + \rho\mLambda\vz + \vgamma)
+\end{equation}
+
+\begin{equation}
+\min_{\vx} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = (\mLambda + \mD^H\mD)^{-1}(\mD^H(\vy + \frac{\veta}{\rho}) + \mLambda\vz + \frac{\vgamma}{\rho})
+\end{equation}
+
+\begin{equation}
+\min_{\vy} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = (\rho\mId + \mW^T\mW)^{-1}(\mW\vs + \rho(\mD\vx - \frac{\veta}{\rho}))
+\end{equation}
+
+\begin{equation}
+\min_{\vy} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = \begin{cases}
+\frac{1}{1 + \rho}(\vs + \rho(\mD\vx - \frac{\veta}{\rho})) & \text{within signal domain}\\
+\mD\vx - \frac{\veta}{\rho} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\min_{\vz} \operatorname{L}_{\rho,\mLambda}(\vx,\vy,\vz,\veta,\vgamma) = \operatorname{S}_{\frac{\lambda\mLambda^{-1}}{\rho}}(\vx - \frac{\mLambda^{-1}\vgamma}{\rho})
+\end{equation}
+
+From this, we can get the update equations:
+\begin{equation}
+\vx^{(k + 1)} = (\mLambda + \mD^H\mD)^{-1}(\mD^H(\vy^{(k)} - \vs + \frac{\veta^{(k)}}{\rho}) + \mLambda\vz^{(k)} + \frac{\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)}= \begin{cases}
+\frac{1}{1 + \rho}(\vs + \rho(\mD\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho})) & \text{within signal domain}\\
+\mD\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\vz^{(k + 1)}= \operatorname{S}_{\frac{\lambda\mLambda^{-1}}{\rho}}(\vx^{(k + 1)} - \frac{\mLambda^{-1}\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vgamma^{(k + 1)} = \vgamma^{(k)} + \rho\mLambda(\vz^{(k + 1)} - \vx^{(k + 1)})
+\end{equation}
+
+\begin{equation}
+\veta^{(k + 1)} = \veta^{(k)} + \rho(\vy^{(k + 1)} - \mD\vx^{(k + 1)})
+\end{equation}
+
+Now, it will be helpful to add a version of scaled ADMM.
+
+Recall that
+
+\begin{equation}
+(\mLambda + \mD^H\mD)^{-1} = \mLambda^{-\frac{1}{2}}(\mId + \mLambda^{-\frac{1}{2}}\mD^H\mD\mLambda^{-\frac{1}{2}})^{-1}\mLambda^{-\frac{1}{2}}
+\end{equation}
+
+So,
+\begin{equation}
+\vx^{(k + 1)} = \mLambda^{-\frac{1}{2}}(\mId + \mLambda^{-\frac{1}{2}}\mD^H\mD\mLambda^{-\frac{1}{2}})^{-1}\mLambda^{-\frac{1}{2}}(\mD^H(\vy^{(k)} - \vs + \frac{\veta^{(k)}}{\rho}) + \mLambda\vz^{(k)} + \frac{\vgamma^{(k)}}{\rho})
+\end{equation}
+
+
+
+\begin{equation}
+\mLambda^{\frac{1}{2}}\vx^{(k + 1)} = (\mId + (\mD\mLambda^{-\frac{1}{2}})^H\mD\mLambda^{-\frac{1}{2}})^{-1}((\mD\mLambda^{-\frac{1}{2}})^H(\vy^{(k)} - \vs + \frac{\veta^{(k)}}{\rho}) + \mLambda^{\frac{1}{2}}\vz^{(k)} + \frac{\mLambda^{-\frac{1}{2}}\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)}= \begin{cases}
+\frac{1}{1 + \rho}(\vs + \rho(\mD\mLambda^{-\frac{1}{2}}\mLambda^{\frac{1}{2}}\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho})) & \text{within signal domain}\\
+\mD\mLambda^{-\frac{1}{2}}\mLambda^{\frac{1}{2}}\vx^{(k + 1)} - \frac{\veta^{(k)}}{\rho} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\mLambda^{\frac{1}{2}}\vz^{(k + 1)}= \operatorname{S}_{\frac{\lambda\mLambda^{-\frac{1}{2}}}{\rho}}(\mLambda^{\frac{1}{2}}\vx^{(k + 1)} - \frac{\mLambda^{-\frac{1}{2}}\vgamma^{(k)}}{\rho})
+\end{equation}
+
+\begin{equation}
+\frac{\mLambda^{-\frac{1}{2}}\vgamma^{(k + 1)}}{\rho} = \frac{\mLambda^{-\frac{1}{2}}\vgamma^{(k)}}{\rho} + \mLambda^{\frac{1}{2}}\vz^{(k + 1)} - \mLambda^{\frac{1}{2}}\vx^{(k + 1)}
+\end{equation}
+
+\begin{equation}
+\frac{\veta^{(k + 1)}}{\rho} = \frac{\veta^{(k)}}{\rho} + \vy^{(k + 1)} - \mD\mLambda^{-\frac{1}{2}}\mLambda^{\frac{1}{2}}\vx^{(k + 1)}
+\end{equation}
+
+So, now we can simplify this with some substitutions:
+\begin{equation}
+\mA = \mId + (\mD\mLambda^{-\frac{1}{2}})^H\mD\mLambda^{-\frac{1}{2}}
+\end{equation}
+
+\begin{equation}
+\mD = \mD\mLambda^{-\frac{1}{2}}
+\end{equation}
+
+\begin{equation}
+\vx = \mLambda^{\frac{1}{2}}\vx
+\end{equation}
+
+\begin{equation}
+\vz = \mLambda^{\frac{1}{2}}\vz
+\end{equation}
+
+\begin{equation}
+\vgamma = \frac{\mLambda^{-\frac{1}{2}}\vgamma}{\rho}
+\end{equation}
+\begin{equation}
+\veta = \frac{\veta}{\rho}
+\end{equation}
+
+With these substitutions, we arrive at the following:
+
+\begin{equation}
+\vx^{(k + 1)} = \mA^{-1}(\mD^H(\vy^{(k)} - \vs + \veta^{(k)}) + \vz^{(k)} + \vgamma^{(k)})
+\end{equation}
+
+\begin{equation}
+\vy^{(k + 1)}= \begin{cases}
+\frac{1}{1 + \rho}(\vs + \rho(\mD\vx^{(k + 1)} - \veta^{(k)})) & \text{within signal domain}\\
+\mD\vx^{(k + 1)} - \veta^{(k)} & \text{outside signal domain}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\vz^{(k + 1)}= \operatorname{S}_{\frac{\lambda\mLambda^{-\frac{1}{2}}}{\rho}}(\vx^{(k + 1)} - \vgamma^{(k)})
+\end{equation}
+
+\begin{equation}
+\vgamma^{(k + 1)} = \vgamma^{(k)} + \vz^{(k + 1)} - \vx^{(k + 1)}
+\end{equation}
+
+\begin{equation}
+\veta^{(k + 1)} = \veta^{(k)} + \vy^{(k + 1)} - \mD\vx^{(k + 1)}
+\end{equation}
+
+\end{document}
