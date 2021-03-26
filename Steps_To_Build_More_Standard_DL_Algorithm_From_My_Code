@@ -1,0 +1,9 @@
+Inherit from standard function.
+
+Initialize b-value for Z updates to lambda.
+
+Change output to include the primal reconstruction, with a custom gradient that snuffs out both coefficient gradients and gradients in respect to the b-value of the Z updates and mu. The custom gradient should produce the appropriate dictionary update.
+
+Set the loss in respect to the primal reconstruction.
+
+The challenge comes with the dictionary update. It's certainly feasible to replace the dictionary object, so that the post-gradient update is computed as desired. However, if initialization is the plan, and the post-gradient updates are different between initialization and the rest of training, the entire post-gradient update process may need to be replaced with one that relies on the Keras callback system. This shouldn't be hard: the callback object has access to the model, so it can directly access a list of trainable parameters. So, all that needs to be done is creating a new dictionary object that has two separate post-gradient updates that different callbacks access.

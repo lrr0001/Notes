@@ -1,0 +1,192 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{bbm}
+
+\input{defs-OCDL-LRU}
+\begin{document}
+
+The inconvenient properties of the YUV transform is causing me more problems than anticipated.
+
+\section{Summary}
+
+\begin{enumerate}
+\item
+Summary
+\item
+The Inverse Problem
+\begin{enumerate}
+\item
+I don't know how to solve the inverse problem if I use linear approximation for quantization.
+\item
+Inverse problem without linear approximation for quantization is solvable with $(256 \times 256)$ Cholesky factorization. However, the indexing is awkward, so it would take some time to code.
+\end{enumerate}
+\item
+Accounting for Quantization in the Dual Update
+\begin{enumerate}
+\item 
+I can handle quantization in the dual update, but...
+\item
+This will lead to suboptimal solutions if quantization is not also handled in the primal updates.
+\end{enumerate}
+\item
+Accounting for Quantization in the Primal Update
+\begin{enumerate}
+\item
+I don't have good solution here.
+\item
+Approximate solutions also have problems.
+\end{enumerate}
+\end{enumerate}
+Everywhere I look there's another problem to solve. I'm starting to lean towards doing my convolutions in YUV domain to dodge all of these issues. That way, the conversion to JPEG coefficients is just a projection. I'm not sure exactly how that effects normalization of dictionaries, the model, or the dictionary learning process, but that seems like an easier problem to deal with than these. The math doesn't really care whether I'm working in RGB or YUV.
+
+
+\section{The Inverse Problem}
+
+Here is the fundamental problem.
+
+Let $\mB$ be the linear operator consisting of three to four operations: compute the YUV transform, downsample the U and V channels, compute an $8 \times 8$ block norm-preserving DCT.  If using a linear approximation of quantization, I would then zero out some of the higher frequencies.
+
+
+The problem I need to solve is this:
+
+\begin{equation}
+\begin{aligned}
+\min_{\vv} & \frac{\mu}{2} \|\vv - \vx\| + \frac{\rho}{2}\|\mB\vv - \vy\|_2^2
+\end{aligned}
+\end{equation}
+
+(My notes have more complicated expressions in place of $\vx$ and $\vy$, but how those variables are calculated isn't relevant to this specific problem.)
+
+This problem is equivalent to solving for $\vv$ in this equation:
+
+\begin{equation}
+(\mu\mId + \rho\mB^T\mB)\vv = \vx + \mB^T\vy
+\end{equation}
+
+When thought of as a matrix and without the linear quantization approximation  $\mB$ is of size $(256 \times 768)$. With use of Woodbury matrix identity, I could compute the Cholesky on a $(256 \times 256)$ matrix. However, this would prevent me from using the linear quantization approximation.
+
+There is also an equivalent inverse problem:
+
+\begin{equation}
+(\mu\mC + \rho\mS)\vv = \mC(\vx + \mB^T\vy)
+\end{equation}
+
+where $\mC$ is an operator that only acts across channels, and $\mS$ is like $\mB^T\mB$ only with the YUV transform and its transpose removed.  Put another way, $\mC$ acts across channels, and $\mS$ acts across space. We can think of this matrix $\mu\mC + \rho\mS$ as the sum of a sparsely banded matrix and a block diagonal matrix in which all diagonal blocks are identical. There is lots of structure here, but I'm at a loss on how to exploit it.  It would be amazing if the inverse could be a sum/composite of spatial and channel functions, but I am skeptical that the inverse has a form that holds such properties and have no idea how I'd find that form if it did exist.
+
+
+\section{Accounting for Quantization in the Dual Update}
+One solution to the quantization problem is to approximate it with a linear operator that just zeros out wherever the JPEG compression algorithm zeroed out frequencies. Such a solution poses challenges to the inverse problem in the previous section, but makes the dual update very straightforward (simply modify $\mB$ to include the linear approximation for quantization). However, if the linear approximation is not used, quantization needs to be accounted for in the dual update.
+
+In ADMM, the dual update is a gradient ascent step in the augmented Lagrangian:
+
+\begin{equation}
+\operatorname{L}_{\rho}(\vx,\vv,\veta) = f(\vx,\vv) + \veta^T(\mB\vv + \vc) + \frac{\rho}{2}\|\mB\vv - \vc\|_2^2
+\end{equation}
+
+which produces the update function:
+\begin{equation}
+\frac{\veta^{(k + 1)}}{\rho} = \frac{\veta^{(k)}}{\rho} + \mB\vv - \vc
+\end{equation}
+
+where $\vc$ is entirely unrelated to the $\mC$ from the previous section, $\mB\vv - \vc = 0$ is the constraint, and $\rho$ is the step size for dual gradient ascent.
+
+
+However, in my case, my constraint is $\mQ(\mB\vv) - \mQ(\vc) = 0$, where $\mQ$ is the quantization operator.
+
+
+The simplest approach to incorporate quantization into the dual update is this:
+\begin{equation}
+\frac{\veta^{(k + 1)}}{\rho} = \frac{\veta^{(k)}}{\rho} + \mQ(\mB\vv) - \mQ(\vc)
+\end{equation}
+
+This approach produces a quantized dual variable. There is a nice property here that if the constraint is met, the dual variable stays constant (so if the algorithm finds the minimum, this update equation won't move away from it.)
+
+I see two drawbacks to this approach:
+\begin{enumerate}
+\item
+The discrete nature could lead to oscillation instead of convergence.
+\item
+If quantization is not incorporated into the primal update, the primal update will be suboptimal. The algorithm will likely converge towards a suboptimal, feasible solution.
+\end{enumerate}
+
+The first item can be addressed by removing the quantize nature of the dual updates.
+
+\begin{equation}
+\begin{aligned}
+\Delta_{\veta} = \arg\min_{\vepsilon} & \|\vepsilon\|_2^2 \\
+\text{subject to } & \mQ(\mB\vv - \vepsilon) - \mQ(\vc) = 0 \\
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\frac{\veta^{(k + 1)}}{\rho} = \frac{\veta^{(k)}}{\rho} + \Delta_{\veta}
+\end{equation}
+
+Overrelaxation can be added without too much headache as well. (Overrelaxation in ADMM is similar to Nesterov momentum in that it "looks forward" for gradients, but unlike Nesterov momentum, overrelaxation doesn't keep a cummulative velocity term.)
+
+\begin{equation}
+\begin{aligned}
+\Delta_{\veta} = \arg\min_{\vepsilon} & \|\vepsilon\|_2^2 \\
+\text{subject to } & \mQ(\frac{(\alpha - 1)\mB\vv^{(k)} + \mB\vv^{(k + 1)}}{\alpha} - \vepsilon) - \mQ(\vc) = 0 \\
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\frac{\veta^{(k + 1)}}{\rho} = \frac{\veta^{(k)}}{\rho} + \alpha\Delta_{\veta}
+\end{equation}
+
+However, the second drawback cannot be easily addressed with the dual update. The problem needs to be fixed during the primal update.
+
+
+\section{Accounting for Quantization in the primal update}
+
+The problem that needs to be solved:
+\begin{equation}
+\vv = \arg\min_{\vv}  \frac{\mu}{2}\|\vv - \vx\|_2^2 + \frac{\rho}{2}\|\mQ(\mB\vv) - \mQ(\vc) + \frac{\veta}{\rho}\|_2^2
+\end{equation}
+
+The approach that I think makes most sense here is to estimate $\vv$ ignoring quantization, and then try to modify the result in a way that does not change the quantization of $\vv$.
+
+That is,
+\begin{equation}
+\vv = \vv_{\text{est}} + \mB^{-1}\vepsilon
+\end{equation}
+where
+\begin{equation}
+\mQ(\mB\vv_\text{est} + \vepsilon) = \mQ(\mB\vv_\text{est})
+\end{equation}
+and $\mB^{-1}$ the a right-side inverse (the one you'd use to reconstruct a signal from JPEG coefficients. That is, inverse DCT, upsample UV channels, and convert from YUV to RGB.)
+
+However, I do not know how to get $\vepsilon$ in a tractable way, since $\mB\vv$ and $\vv$ are in diferent domains.
+
+I thought about doing this:
+\begin{equation}
+\begin{aligned}
+\vepsilon = \arg\min_{\vepsilon} & \|\mB(\vv_{\text{est}} - \vx) + \vepsilon\|_2^2 \\
+\text{subject to } & \mQ(\mB\vv_{\text{est}} + \vepsilon) - \mQ(\vv_{\text{est}}) = 0 \\
+\end{aligned}
+\end{equation}
+
+However, substituting
+\begin{equation}
+\|\mB(\vv_{\text{est}} - \vx) + \vepsilon\|_2^2
+\end{equation}
+for
+\begin{equation}
+\|\vv_{\text{est}} - \vx + \mB^{-1}\vepsilon\|_2^2
+\end{equation}
+is mathematically dubious. Using eigenvalues, you can bound one norm using the other, but a $\vepsilon$ that increases one norm could decrease the other.  (I find it helpful to think of the unit balls: this approach is using tilted elipsiod unit ball instead of a spherical unit ball, and hoping the two line up well enough that it doesnt matter.)
+
+I had one last idea. Let $\mW$ be the RGB to YUV transform followed by downsampling the UV channels, and $\mW^{-1}$ be upsampling the UV channels followed by the YUV to RGB transform (again, only a right-side inverse).
+I thought about doing this:
+\begin{equation}
+\begin{aligned}
+\vepsilon = \arg\min_{\vepsilon} & \|\mW^{-1}\mB(\vv_{\text{est}} - \vx) + \mW^{-1}\vepsilon\|_2^2 \\
+\text{subject to } & \mQ(\mB\vv_{\text{est}} + \vepsilon) - \mQ(\vv_{\text{est}}) = 0 \\
+\end{aligned}
+\end{equation}
+
+The substitution sill suffers some of the same problems as before, but I think this is the closest elipsoid I can get to the sphere without resorting to an iterative or combinatoric approach. I haven't solved it, but it should have a closed-form solution. It's a quadratic function, and it's constraints are just holding it in a 4-d rectangular prism.
+
+\end{document}
